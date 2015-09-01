@@ -14,7 +14,7 @@
     });
 
     var exported = {
-        wet: ['Config', 'fishtones/models/wet/ExpMSMSSpectrum', 'fishtones/collections/wet/ExpMSMSSpectrumCollection', 'fishtones/models/wet/MSMSRun', 'fishtones/models/wet/Injection', 'fishtones/models/wet/Experiment', 'fishtones/collections/wet/XICCollection', 'fishtones/views/wet/XICView', 'fishtones/views/wet/MultiXICView', 'fishtones/views/wet/XICMultiPaneView', 'fishtones/views/wet/SpectrumView'],
+        wet: ['Config', 'fishtones/models/wet/ExpMSMSSpectrum', 'fishtones/collections/wet/ExpMSMSSpectrumCollection', 'fishtones/models/wet/MSMSRun', 'fishtones/models/wet/Injection', 'fishtones/models/wet/Experiment', 'fishtones/collections/wet/XICCollection', 'fishtones/views/wet/XICView', 'fishtones/models/wet/XIC', 'fishtones/views/wet/MultiXICView', 'fishtones/views/wet/XICMultiPaneView', 'fishtones/views/wet/SpectrumView'],
         dry: ['fishtones/models/dry/RichSequence', 'fishtones/services/dry/ImplicitModifier', 'fishtones/services/dry/MassBuilder', 'fishtones/services/dry/RichSequenceShortcuter', 'fishtones/collections/dry/ResidueModificationDictionary', 'fishtones/collections/dry/AminoAcidDictionary', 'fishtones/views/dry/forms/RichSequenceInput', 'fishtones/views/dry/TheoOnSequenceView'],
         match: ['fishtones/models/match/SpectraPairAlignment', 'fishtones/views/match/SpectraPairAlignmentView', 'fishtones/models/match/PSMAlignment', 'fishtones/views/match/MatchSpectrumView', 'fishtones/views/match/MatchGridValuesView', 'fishtones/views/match/MatchMapPQView', 'fishtones/views/match/MatchMapSlimView', 'fishtones/views/match/SpectraPairAlignmentIcon'],
         utils: ['fishtones/views/utils/D3ScalingContext', 'fishtones/utils/DeltaMass']
@@ -56,7 +56,7 @@
 
     define([
         'jquery',
-        'Config', 'fishtones/models/wet/ExpMSMSSpectrum', 'fishtones/collections/wet/ExpMSMSSpectrumCollection', 'fishtones/models/wet/MSMSRun', 'fishtones/models/wet/Injection', 'fishtones/models/wet/Experiment', 'fishtones/collections/wet/XICCollection', 'fishtones/views/wet/XICView', 'fishtones/views/wet/MultiXICView', 'fishtones/views/wet/XICMultiPaneView', 'fishtones/views/wet/SpectrumView',
+        'Config', 'fishtones/models/wet/ExpMSMSSpectrum', 'fishtones/collections/wet/ExpMSMSSpectrumCollection', 'fishtones/models/wet/MSMSRun', 'fishtones/models/wet/Injection', 'fishtones/models/wet/Experiment', 'fishtones/collections/wet/XICCollection', 'fishtones/views/wet/XICView', 'fishtones/models/wet/XIC', 'fishtones/views/wet/MultiXICView', 'fishtones/views/wet/XICMultiPaneView', 'fishtones/views/wet/SpectrumView',
         'fishtones/models/dry/RichSequence', 'fishtones/services/dry/ImplicitModifier', 'fishtones/services/dry/MassBuilder', 'fishtones/services/dry/RichSequenceShortcuter', 'fishtones/collections/dry/ResidueModificationDictionary', 'fishtones/collections/dry/AminoAcidDictionary', 'fishtones/views/dry/forms/RichSequenceInput', 'fishtones/views/dry/TheoOnSequenceView',
         'fishtones/models/match/SpectraPairAlignment', 'fishtones/views/match/SpectraPairAlignmentView', 'fishtones/models/match/PSMAlignment', 'fishtones/views/match/MatchSpectrumView', 'fishtones/views/match/MatchGridValuesView', 'fishtones/views/match/MatchMapPQView', 'fishtones/views/match/MatchMapSlimView', 'fishtones/views/match/SpectraPairAlignmentIcon',
         'fishtones/views/utils/D3ScalingContext', 'fishtones/utils/DeltaMass',
