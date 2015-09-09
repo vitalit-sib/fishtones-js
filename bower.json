@@ -1,5 +1,5 @@
 {
-  "name": "fishtones-js",
+  "name": "sib-fishtones-js",
   "version": "0.1.2",
   "authors": [
     "Alexandre Masselot <masselot.alexandre@gene.com>",
@@ -7,8 +7,8 @@
   ],
   "description": "LC/MSMS libraries, dry, wet & match",
     "main": [
-        "dist/fishtones-js-bundle-min.js",
-        "dist/fishtones-js.css"
+        "dist/sib-fishtones-js-bundle-min.js",
+        "dist/sib-fishtones-js.css"
     ],
   "moduleType": [
     "amd"
