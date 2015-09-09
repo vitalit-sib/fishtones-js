@@ -1,8 +1,9 @@
 {
   "name": "fishtones-js",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "authors": [
-    "Alexandre Masselot <masselot.alexandre@gene.com>"
+    "Alexandre Masselot <masselot.alexandre@gene.com>",
+    "Roman Mylonas <roman.mylonas@isb-sib.ch>"
   ],
   "description": "LC/MSMS libraries, dry, wet & match",
     "main": [
