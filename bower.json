@@ -7,8 +7,8 @@
   ],
   "description": "LC/MSMS libraries, dry, wet & match",
     "main": [
-        "dist/sib-fishtones-js-bundle-min.js",
-        "dist/sib-fishtones-js.css"
+        "dist/fishtones-js-bundle-min.js",
+        "dist/fishtones-js.css"
     ],
   "moduleType": [
     "amd"
