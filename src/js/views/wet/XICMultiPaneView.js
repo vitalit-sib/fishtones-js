@@ -45,8 +45,6 @@ define(['jquery', 'underscore', 'Backbone', 'd3', '../commons/CommonWidgetView',
 
                 self.listenTo(self.model, 'add', self.setup);
                 self.listenTo(self.model, 'reset', self.clear);
-
-                //console.log(self);
             },
 
             p_init_rt_domain_selector: function (cb) {

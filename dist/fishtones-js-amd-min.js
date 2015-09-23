@@ -5942,11 +5942,13 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
                 options.yDomain = [0, _.max(self.model.get('intensities')) * 1.1];
             }
             self.setupScalingContext(options);
-
             self.p_set_ms1points();
+        
             if (self.richSequence) {
                 self.p_set_msmsdata();
             }
+            self.p_set_selectedRt();
+
             return self;
         },
         //return the class - well, I cannot figure what this os done like that...
@@ -5969,6 +5971,27 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
             var clazz = self.p_clazzCommon() + ' plot';
             //console.log('adding ms1point', ms1points)
             self.p1 = cont.selectAll("path." + clazz).data([chromato._dataPoints]).enter().insert("path");
+        },
+        // indicate the selected Rt as a red line
+        p_set_selectedRt: function () {
+            var self = this;
+            var selRt = self.model.get('selectedRt');
+            
+            var cont = undefined;
+
+            if(selRt){
+                cont = self.el.append('line');
+                cont.attr('stroke', "red");
+                cont.attr('stroke-width', 1);
+                cont.attr('x1', 0);
+                cont.attr('x2', 0);
+                cont.attr('y1', 0);
+                // @TODO height shouldnt be hardcoded
+                cont.attr('y2', -55);
+            }
+
+            self.selRtWidget = cont;
+            self.selRt = selRt;
 
         },
         p_set_msmsdata: function () {
@@ -6027,6 +6050,11 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
         _.each(self.msmsData, function (msms) {
             msms.widget.move(x(msms.retentionTime), Math.min(y(msms.intensity), self.scalingContext.height() - 15))
         });
+
+        if(self.selRt){
+            //self.selRtWidget.attr('transform', 'scale(' + 1 + ',' + 1000 + ')');
+            self.selRtWidget.attr('transform', 'translate(' + x(self.selRt) + ',' + self.scalingContext.height() + ')').style('left', x + 'px').style('left', y + 'px').style('position', 'relative');
+        }
         // var ms2points = _.zip(chrm.msms.retentionTimes, chrm.msms.intensities, chrm.msms.spectraIds);
     }
 
@@ -6282,8 +6310,6 @@ define('fishtones/views/wet/XICMultiPaneView',['jquery', 'underscore', 'Backbone
 
                 self.listenTo(self.model, 'add', self.setup);
                 self.listenTo(self.model, 'reset', self.clear);
-
-                //console.log(self);
             },
 
             p_init_rt_domain_selector: function (cb) {
@@ -8518,7 +8544,7 @@ define('fishtones/views/match/SpectraPairAlignmentIcon',['underscore', 'd3', '..
     });
 
     var exported = {
-        wet: ['Config', 'fishtones/models/wet/ExpMSMSSpectrum', 'fishtones/collections/wet/ExpMSMSSpectrumCollection', 'fishtones/models/wet/MSMSRun', 'fishtones/models/wet/Injection', 'fishtones/models/wet/Experiment', 'fishtones/collections/wet/XICCollection', 'fishtones/views/wet/XICView', 'fishtones/views/wet/MultiXICView', 'fishtones/views/wet/XICMultiPaneView', 'fishtones/views/wet/SpectrumView'],
+        wet: ['Config', 'fishtones/models/wet/ExpMSMSSpectrum', 'fishtones/collections/wet/ExpMSMSSpectrumCollection', 'fishtones/models/wet/MSMSRun', 'fishtones/models/wet/Injection', 'fishtones/models/wet/Experiment', 'fishtones/collections/wet/XICCollection', 'fishtones/views/wet/XICView', 'fishtones/models/wet/XIC', 'fishtones/views/wet/MultiXICView', 'fishtones/views/wet/XICMultiPaneView', 'fishtones/views/wet/SpectrumView'],
         dry: ['fishtones/models/dry/RichSequence', 'fishtones/services/dry/ImplicitModifier', 'fishtones/services/dry/MassBuilder', 'fishtones/services/dry/RichSequenceShortcuter', 'fishtones/collections/dry/ResidueModificationDictionary', 'fishtones/collections/dry/AminoAcidDictionary', 'fishtones/views/dry/forms/RichSequenceInput', 'fishtones/views/dry/TheoOnSequenceView'],
         match: ['fishtones/models/match/SpectraPairAlignment', 'fishtones/views/match/SpectraPairAlignmentView', 'fishtones/models/match/PSMAlignment', 'fishtones/views/match/MatchSpectrumView', 'fishtones/views/match/MatchGridValuesView', 'fishtones/views/match/MatchMapPQView', 'fishtones/views/match/MatchMapSlimView', 'fishtones/views/match/SpectraPairAlignmentIcon'],
         utils: ['fishtones/views/utils/D3ScalingContext', 'fishtones/utils/DeltaMass']
@@ -8560,7 +8586,7 @@ define('fishtones/views/match/SpectraPairAlignmentIcon',['underscore', 'd3', '..
 
     define('MSMSJSExport',[
         'jquery',
-        'Config', 'fishtones/models/wet/ExpMSMSSpectrum', 'fishtones/collections/wet/ExpMSMSSpectrumCollection', 'fishtones/models/wet/MSMSRun', 'fishtones/models/wet/Injection', 'fishtones/models/wet/Experiment', 'fishtones/collections/wet/XICCollection', 'fishtones/views/wet/XICView', 'fishtones/views/wet/MultiXICView', 'fishtones/views/wet/XICMultiPaneView', 'fishtones/views/wet/SpectrumView',
+        'Config', 'fishtones/models/wet/ExpMSMSSpectrum', 'fishtones/collections/wet/ExpMSMSSpectrumCollection', 'fishtones/models/wet/MSMSRun', 'fishtones/models/wet/Injection', 'fishtones/models/wet/Experiment', 'fishtones/collections/wet/XICCollection', 'fishtones/views/wet/XICView', 'fishtones/models/wet/XIC', 'fishtones/views/wet/MultiXICView', 'fishtones/views/wet/XICMultiPaneView', 'fishtones/views/wet/SpectrumView',
         'fishtones/models/dry/RichSequence', 'fishtones/services/dry/ImplicitModifier', 'fishtones/services/dry/MassBuilder', 'fishtones/services/dry/RichSequenceShortcuter', 'fishtones/collections/dry/ResidueModificationDictionary', 'fishtones/collections/dry/AminoAcidDictionary', 'fishtones/views/dry/forms/RichSequenceInput', 'fishtones/views/dry/TheoOnSequenceView',
         'fishtones/models/match/SpectraPairAlignment', 'fishtones/views/match/SpectraPairAlignmentView', 'fishtones/models/match/PSMAlignment', 'fishtones/views/match/MatchSpectrumView', 'fishtones/views/match/MatchGridValuesView', 'fishtones/views/match/MatchMapPQView', 'fishtones/views/match/MatchMapSlimView', 'fishtones/views/match/SpectraPairAlignmentIcon',
         'fishtones/views/utils/D3ScalingContext', 'fishtones/utils/DeltaMass',

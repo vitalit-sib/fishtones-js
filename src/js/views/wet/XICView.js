@@ -18,11 +18,13 @@ define(['underscore', 'Backbone', 'd3', '../commons/CommonWidgetView', 'fishtone
                 options.yDomain = [0, _.max(self.model.get('intensities')) * 1.1];
             }
             self.setupScalingContext(options);
-
             self.p_set_ms1points();
+        
             if (self.richSequence) {
                 self.p_set_msmsdata();
             }
+            self.p_set_selectedRt();
+
             return self;
         },
         //return the class - well, I cannot figure what this os done like that...
@@ -45,6 +47,27 @@ define(['underscore', 'Backbone', 'd3', '../commons/CommonWidgetView', 'fishtone
             var clazz = self.p_clazzCommon() + ' plot';
             //console.log('adding ms1point', ms1points)
             self.p1 = cont.selectAll("path." + clazz).data([chromato._dataPoints]).enter().insert("path");
+        },
+        // indicate the selected Rt as a red line
+        p_set_selectedRt: function () {
+            var self = this;
+            var selRt = self.model.get('selectedRt');
+            
+            var cont = undefined;
+
+            if(selRt){
+                cont = self.el.append('line');
+                cont.attr('stroke', "red");
+                cont.attr('stroke-width', 1);
+                cont.attr('x1', 0);
+                cont.attr('x2', 0);
+                cont.attr('y1', 0);
+                // @TODO height shouldnt be hardcoded
+                cont.attr('y2', -55);
+            }
+
+            self.selRtWidget = cont;
+            self.selRt = selRt;
 
         },
         p_set_msmsdata: function () {
@@ -103,6 +126,11 @@ define(['underscore', 'Backbone', 'd3', '../commons/CommonWidgetView', 'fishtone
         _.each(self.msmsData, function (msms) {
             msms.widget.move(x(msms.retentionTime), Math.min(y(msms.intensity), self.scalingContext.height() - 15))
         });
+
+        if(self.selRt){
+            //self.selRtWidget.attr('transform', 'scale(' + 1 + ',' + 1000 + ')');
+            self.selRtWidget.attr('transform', 'translate(' + x(self.selRt) + ',' + self.scalingContext.height() + ')').style('left', x + 'px').style('left', y + 'px').style('position', 'relative');
+        }
         // var ms2points = _.zip(chrm.msms.retentionTimes, chrm.msms.intensities, chrm.msms.spectraIds);
     }
 
