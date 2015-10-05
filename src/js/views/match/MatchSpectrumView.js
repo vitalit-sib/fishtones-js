@@ -38,7 +38,7 @@ define(['underscore', 'd3', '../commons/CommonWidgetView', 'fishtones/views/util
         p_setup: function () {
             var self = this;
             // var evt = d3.mouse(self.container);
-            self.vis = self.el.append('svg')
+            self.vis = self.el.append('svg');
             self.vis.attr('width', self.width()).attr('height', self.height()).attr('class', 'd3-widget-match-spectrum');
             if (self.isFlying) {
                 var x = d3.event.pageX + 10;

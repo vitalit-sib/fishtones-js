@@ -426,6 +426,10 @@ path.chromato.target_2 {
     stroke: #0f0;
 }
 
+g.chromato.rtBar line {
+    stroke: #f00;
+}
+
 g.legend-container text{
     font-size:70%;
     alignment-baseline: central;

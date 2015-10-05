@@ -53,20 +53,17 @@ define(['underscore', 'Backbone', 'd3', '../commons/CommonWidgetView', 'fishtone
             var self = this;
             var selRt = self.model.get('selectedRt');
             
-            var cont = undefined;
+            var rtBar = undefined;
 
             if(selRt){
-                cont = self.el.append('line');
-                cont.attr('stroke', "red");
-                cont.attr('stroke-width', 1);
-                cont.attr('x1', 0);
-                cont.attr('x2', 0);
-                cont.attr('y1', 0);
-                // @TODO height shouldnt be hardcoded
-                cont.attr('y2', -55);
+                cont = self.el.append('g');
+                cont.attr('class', self.p_clazzCommon() + ' rtBar');
+    
+                // add an empty line for the rtBar
+                rtBar = cont.append('line');
             }
 
-            self.selRtWidget = cont;
+            self.selRtWidget = rtBar;
             self.selRt = selRt;
 
         },
@@ -128,8 +125,9 @@ define(['underscore', 'Backbone', 'd3', '../commons/CommonWidgetView', 'fishtone
         });
 
         if(self.selRt){
-            //self.selRtWidget.attr('transform', 'scale(' + 1 + ',' + 1000 + ')');
-            self.selRtWidget.attr('transform', 'translate(' + x(self.selRt) + ',' + self.scalingContext.height() + ')').style('left', x + 'px').style('left', y + 'px').style('position', 'relative');
+            self.selRtWidget.attr('stroke', "red").attr('stroke-width', 1);
+            self.selRtWidget.attr('x1', 0).attr('x2', 0).attr('y1', 0).attr('y2', self.scalingContext.height());
+            self.selRtWidget.attr('transform', 'translate(' + x(self.selRt) + ',' + 0 + ')').style('left', x + 'px').style('left', y + 'px').style('position', 'relative');
         }
         // var ms2points = _.zip(chrm.msms.retentionTimes, chrm.msms.intensities, chrm.msms.spectraIds);
     }

@@ -40,7 +40,6 @@ new fishtones.wet.Injection({id: 42}).fetch({
           }, function (x) {
             x.set('id', x.get('mass'));
             xicCol.add(x);
-            console.log(x);
           });
         });
       });
