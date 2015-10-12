@@ -18500,7 +18500,7 @@ define('fishtones/views/match/MatchSpectrumView',['underscore', 'd3', '../common
             self.tol = options.tol || 500;
 
             self.heightXAxis = 21;
-            self.peaksBaselineHeight = 10;
+            self.peaksBaselineHeight = 0;
 
             if (options.flying) {
                 self.el = d3.select('body');
@@ -18563,7 +18563,7 @@ define('fishtones/views/match/MatchSpectrumView',['underscore', 'd3', '../common
 
             self.d3HolderXAxis = svgsp.append('g').attr('class', 'xaxis').attr('transform', 'translate(0,' + hSpectrum + ')');
             self.d3holderPrecursor = svgsp.selectAll('g.precursor').data(self.data.precursor).enter().append('g')
-            self.d3holderPrecursor.append('path').attr('class', 'precursor').attr('d', 'M0,-20L10,0L-10,0L0,-20').attr('x', function (p) {
+            self.d3holderPrecursor.append('path').attr('class', 'precursor').attr('d', 'M0,-10L5,0L-5,0L0,-10').attr('x', function (p) {
                 return p.x;
             });
             self.d3holderPeaks = svgsp.selectAll('line.peak').data(self.data.peaks).enter().append('line').attr('class', function (pk) {
