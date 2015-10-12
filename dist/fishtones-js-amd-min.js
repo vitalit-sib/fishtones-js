@@ -1574,6 +1574,11 @@ define('fishtones/data/residueModifications',[],function () {
             "mass": 57.021464
         },
         {
+            "name": "Carbamidomethyl-Ox",
+            "fullName": "Iodoacetamide derivative with oxidation",
+            "mass": 73.016378
+        },
+        {
             "name": "Carbamyl",
             "fullName": "Carbamylation",
             "mass": 43.005814
@@ -1652,6 +1657,16 @@ define('fishtones/data/residueModifications',[],function () {
             "name": "Oxidation",
             "fullName": "Oxidation or Hydroxylation",
             "mass": 15.994915
+        },
+        {
+            "name": "Dioxidation",
+            "fullName": "Dioxidation",
+            "mass": 31.989824
+        },
+        {
+            "name": "Trioxidation",
+            "fullName": "Trioxidation",
+            "mass": 47.984739
         },
         {
             "name": "Dimethyl",
