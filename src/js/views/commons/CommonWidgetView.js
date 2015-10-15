@@ -67,7 +67,6 @@ define(['underscore', 'Backbone', 'd3', '../utils/D3ScalingContext', '../utils/D
             height : self._height,
             width : self._width
           });
-          self.scalingContext.setRangeSelected(false);
         }
 
         if (options.xDomain) {

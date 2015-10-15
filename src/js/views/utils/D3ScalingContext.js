@@ -181,14 +181,6 @@ define(['d3', 'underscore', 'Backbone'], function(d3, _, Backbone) {
       self.fireChangeXDomain();
       return self;
     },
-    isRangeSelected : function(){
-      var self = this;
-      return self._rangeSelected;
-    },
-    setRangeSelected : function(rangeSelected){
-      var self = this;
-      self._rangeSelected = rangeSelected;
-    },
     isXZoomed : function() {
       var self = this;
       return self._xDomain[0] > self._xOrigDomain[0] || self._xDomain[1] < self._xOrigDomain[1];
