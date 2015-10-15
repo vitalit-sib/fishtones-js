@@ -24,6 +24,7 @@ define(['underscore', 'Backbone', 'd3', '../commons/CommonWidgetView', 'fishtone
                 self.p_set_msmsdata();
             }
             self.p_set_selectedRt();
+            self.p_set_selectedIntensity();
 
             return self;
         },
@@ -68,6 +69,17 @@ define(['underscore', 'Backbone', 'd3', '../commons/CommonWidgetView', 'fishtone
             self.selRt = selRt;
 
         },
+        // indicate the selected Intesity with a text
+        p_set_selectedIntensity: function(){
+            var self = this;
+            var selRt = self.model.get('selected');
+            
+            cont = self.el.append('g');
+            cont.attr('class', self.p_clazzCommon() + ' selInt');
+    
+            // add an empty text
+            self.selInt = cont.append('text');
+        },
         p_set_msmsdata: function () {
             var self = this;
             var chromato = self.model;
@@ -110,8 +122,8 @@ define(['underscore', 'Backbone', 'd3', '../commons/CommonWidgetView', 'fishtone
 
         var clazz = self.p_clazzCommon() + ' msms-annot';
 
-        var x = self.scalingContext.x();//d3.scale.linear().domain(self.scalingContext.xScale.domain()).range(self.scalingContext.xScale.range())
-        var y = self.scalingContext.y();//d3.scale.linear().domain(self.scalingContext.yScale.domain()).range(self.scalingContext.yScale.range())
+        var x = self.scalingContext.x();    //d3.scale.linear().domain(self.scalingContext.xScale.domain()).range(self.scalingContext.xScale.range())
+        var y = self.scalingContext.y();    //d3.scale.linear().domain(self.scalingContext.yScale.domain()).range(self.scalingContext.yScale.range())
 
         var pLine = d3.svg.line().x(function (d) {
             return x(d[0]);
@@ -132,6 +144,14 @@ define(['underscore', 'Backbone', 'd3', '../commons/CommonWidgetView', 'fishtone
             self.selRtWidget.attr('transform', 'translate(' + x(self.selRt) + ',' + 0 + ')').style('left', x + 'px').style('left', y + 'px').style('position', 'relative');
         }
 
+        var peak = self.model.get('selected');
+        
+        if(peak){
+            self.selInt.attr('x', x(peak[0])).attr('y', self.scalingContext.height()/2).text(peak[1].toExponential(2));
+            console.log(peak);
+        }else{
+            self.selInt.attr('x', 0).attr('y', 0).text(undefined);
+        }
 
     }
 

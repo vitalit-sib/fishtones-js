@@ -855,14 +855,6 @@ define('fishtones/views/utils/D3ScalingContext',['d3', 'underscore', 'Backbone']
       self.fireChangeXDomain();
       return self;
     },
-    isRangeSelected : function(){
-      var self = this;
-      return self._rangeSelected;
-    },
-    setRangeSelected : function(rangeSelected){
-      var self = this;
-      self._rangeSelected = rangeSelected;
-    },
     isXZoomed : function() {
       var self = this;
       return self._xDomain[0] > self._xOrigDomain[0] || self._xDomain[1] < self._xOrigDomain[1];
@@ -1101,7 +1093,6 @@ define('fishtones/views/commons/CommonWidgetView',['underscore', 'Backbone', 'd3
             height : self._height,
             width : self._width
           });
-          self.scalingContext.setRangeSelected(false);
         }
 
         if (options.xDomain) {
@@ -5973,6 +5964,7 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
                 self.p_set_msmsdata();
             }
             self.p_set_selectedRt();
+            self.p_set_selectedIntensity();
 
             return self;
         },
@@ -6017,6 +6009,17 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
             self.selRt = selRt;
 
         },
+        // indicate the selected Intesity with a text
+        p_set_selectedIntensity: function(){
+            var self = this;
+            var selRt = self.model.get('selected');
+            
+            cont = self.el.append('g');
+            cont.attr('class', self.p_clazzCommon() + ' selInt');
+    
+            // add an empty text
+            self.selInt = cont.append('text');
+        },
         p_set_msmsdata: function () {
             var self = this;
             var chromato = self.model;
@@ -6059,8 +6062,8 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
 
         var clazz = self.p_clazzCommon() + ' msms-annot';
 
-        var x = self.scalingContext.x();//d3.scale.linear().domain(self.scalingContext.xScale.domain()).range(self.scalingContext.xScale.range())
-        var y = self.scalingContext.y();//d3.scale.linear().domain(self.scalingContext.yScale.domain()).range(self.scalingContext.yScale.range())
+        var x = self.scalingContext.x();    //d3.scale.linear().domain(self.scalingContext.xScale.domain()).range(self.scalingContext.xScale.range())
+        var y = self.scalingContext.y();    //d3.scale.linear().domain(self.scalingContext.yScale.domain()).range(self.scalingContext.yScale.range())
 
         var pLine = d3.svg.line().x(function (d) {
             return x(d[0]);
@@ -6081,6 +6084,14 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
             self.selRtWidget.attr('transform', 'translate(' + x(self.selRt) + ',' + 0 + ')').style('left', x + 'px').style('left', y + 'px').style('position', 'relative');
         }
 
+        var peak = self.model.get('selected');
+        
+        if(peak){
+            self.selInt.attr('x', x(peak[0])).attr('y', self.scalingContext.height()/2).text(peak[1].toExponential(2));
+            console.log(peak);
+        }else{
+            self.selInt.attr('x', 0).attr('y', 0).text(undefined);
+        }
 
     }
 
@@ -6338,27 +6349,45 @@ define('fishtones/views/wet/XICMultiPaneView',['jquery', 'underscore', 'Backbone
                 self.listenTo(self.model, 'reset', self.clear);
 
                 self.p_set_selectedRange();
+
                 self.setShiftSelectCallback(function(xs){
+                    self.getMaxWithinRange(xs);
                     self.selectRange(xs);
-                    self.scalingContext.setRangeSelected(true);
                 });
             },
-
-                    // prepare the plot of the range when selecting an area
+            // prepare the plot of the range when selecting an area
             p_set_selectedRange: function () {
                 var self = this;
-                cont = self.el.append('g');
-                cont.attr('class selectedRange');
+                var cont = self.el.append('g');
+                cont.attr('class', 'selectedRange');
                 var highlightRectangle = cont.append('rect');
                 this.highlightRectangle = highlightRectangle;
             },
-
             selectRange: function (rtRange) {
                 var self = this;
                 this.selectedRange = rtRange;
                 this.render();
             },
+            getMaxWithinRange: function (rtRange) {
+                var self = this;
 
+                // get max of selected ranges
+                _.each(self.model.models, function(xic){
+                    var points = _.zip(xic.get('retentionTimes'), xic.get('intensities'));
+                    points = _.filter(points, function(p) {
+                       return p[0] >= rtRange[0] && p[0] <= rtRange[1];
+                    })
+
+                    var maxInt = _.max(points, function(p){
+                        return p[1];
+                    })
+
+                    if(points.length === 0) maxInt = undefined;
+
+                    xic.set('selected', maxInt);
+                });
+
+            },
             p_init_rt_domain_selector: function (cb) {
                 var self = this;
                 //set the RT range selector and pipe it to a callback
@@ -6597,16 +6626,19 @@ define('fishtones/views/wet/XICMultiPaneView',['jquery', 'underscore', 'Backbone
                 }
 
                 // draw a box indicating the selected range
-                if(self.selectedRange){                   
+                if(self.selectedRange){ 
                     var x = self.scalingContext.x();//d3.scale.linear().domain(self.scalingContext.xScale.domain()).range(self.scalingContext.xScale.range())
                     var y = self.scalingContext.y();//d3.scale.linear().domain(self.scalingContext.yScale.domain()).range(self.scalingContext.yScale.range())
     
                     var rectWidth = x(self.selectedRange[1]) - x(self.selectedRange[0]);        
 
-                    self.highlightRectangle.attr('style', 'fill:purple;fill-opacity:0.3;pointer-events:none');
+                    self.highlightRectangle.attr('fill', 'blue');
+                    self.highlightRectangle.attr('fill-opacity', 0.3);
+                    self.highlightRectangle.attr('pointer-events', 'none');
                     self.highlightRectangle.attr('width', rectWidth);
                     self.highlightRectangle.attr('height', self.height());
                     self.highlightRectangle.attr('transform', 'translate(' + x(self.selectedRange[0]) + ',' + 0 + ')').style('left', x + 'px').style('left', y + 'px').style('position', 'relative');
+
                 }
 
             }

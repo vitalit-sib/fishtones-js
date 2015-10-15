@@ -47,27 +47,45 @@ define(['jquery', 'underscore', 'Backbone', 'd3', '../commons/CommonWidgetView',
                 self.listenTo(self.model, 'reset', self.clear);
 
                 self.p_set_selectedRange();
+
                 self.setShiftSelectCallback(function(xs){
+                    self.getMaxWithinRange(xs);
                     self.selectRange(xs);
-                    self.scalingContext.setRangeSelected(true);
                 });
             },
-
-                    // prepare the plot of the range when selecting an area
+            // prepare the plot of the range when selecting an area
             p_set_selectedRange: function () {
                 var self = this;
-                cont = self.el.append('g');
-                cont.attr('class selectedRange');
+                var cont = self.el.append('g');
+                cont.attr('class', 'selectedRange');
                 var highlightRectangle = cont.append('rect');
                 this.highlightRectangle = highlightRectangle;
             },
-
             selectRange: function (rtRange) {
                 var self = this;
                 this.selectedRange = rtRange;
                 this.render();
             },
+            getMaxWithinRange: function (rtRange) {
+                var self = this;
 
+                // get max of selected ranges
+                _.each(self.model.models, function(xic){
+                    var points = _.zip(xic.get('retentionTimes'), xic.get('intensities'));
+                    points = _.filter(points, function(p) {
+                       return p[0] >= rtRange[0] && p[0] <= rtRange[1];
+                    })
+
+                    var maxInt = _.max(points, function(p){
+                        return p[1];
+                    })
+
+                    if(points.length === 0) maxInt = undefined;
+
+                    xic.set('selected', maxInt);
+                });
+
+            },
             p_init_rt_domain_selector: function (cb) {
                 var self = this;
                 //set the RT range selector and pipe it to a callback
@@ -306,16 +324,19 @@ define(['jquery', 'underscore', 'Backbone', 'd3', '../commons/CommonWidgetView',
                 }
 
                 // draw a box indicating the selected range
-                if(self.selectedRange){                   
+                if(self.selectedRange){ 
                     var x = self.scalingContext.x();//d3.scale.linear().domain(self.scalingContext.xScale.domain()).range(self.scalingContext.xScale.range())
                     var y = self.scalingContext.y();//d3.scale.linear().domain(self.scalingContext.yScale.domain()).range(self.scalingContext.yScale.range())
     
                     var rectWidth = x(self.selectedRange[1]) - x(self.selectedRange[0]);        
 
-                    self.highlightRectangle.attr('style', 'fill:purple;fill-opacity:0.3;pointer-events:none');
+                    self.highlightRectangle.attr('fill', 'blue');
+                    self.highlightRectangle.attr('fill-opacity', 0.3);
+                    self.highlightRectangle.attr('pointer-events', 'none');
                     self.highlightRectangle.attr('width', rectWidth);
                     self.highlightRectangle.attr('height', self.height());
                     self.highlightRectangle.attr('transform', 'translate(' + x(self.selectedRange[0]) + ',' + 0 + ')').style('left', x + 'px').style('left', y + 'px').style('position', 'relative');
+
                 }
 
             }
