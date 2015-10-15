@@ -64,6 +64,7 @@ define(['d3', 'underscore', 'Backbone'], function(d3, _, Backbone) {
       self._xDomain[1] = self._xOrigDomain[1];
       self._yDomain[0] = self._yOrigDomain[0];
       self._yDomain[1] = self._yOrigDomain[1];
+
       if (changed) {
         self.trigger('scalechange', 'reset');
       }
@@ -79,7 +80,6 @@ define(['d3', 'underscore', 'Backbone'], function(d3, _, Backbone) {
         self.trigger('scalechange', 'resetX');
       }
       return self;
-
       //self.fireChangeXRange();
     },
     resetY : function() {
@@ -180,6 +180,14 @@ define(['d3', 'underscore', 'Backbone'], function(d3, _, Backbone) {
       }
       self.fireChangeXDomain();
       return self;
+    },
+    isRangeSelected : function(){
+      var self = this;
+      return self._rangeSelected;
+    },
+    setRangeSelected : function(rangeSelected){
+      var self = this;
+      self._rangeSelected = rangeSelected;
     },
     isXZoomed : function() {
       var self = this;

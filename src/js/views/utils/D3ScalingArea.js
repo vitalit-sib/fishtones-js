@@ -57,21 +57,21 @@ define(['underscore', 'd3', 'Backbone', './D3ScalingAreaButtons'], function (_, 
 
             var iButton = 0;
             var fctAddButton = function (name, text, fIsShowing, fAction) {
-                var gbut = g.insert("g").attr('class', 'scaling-area-menu-one-button').attr('transform', 'translate(40,' + (10 + iButton * 27) + ')');
-                var rect = gbut.insert("rect").attr('class', 'button').attr('x', 0).attr('y', 0).attr('width', 50).attr('rx', 5).attr('ry', 5).attr('height', 22);
-                gbut.append('text').attr("x", 25).attr("y", 11).text(text);
+                var gbut = g.insert("g").attr('class', 'scaling-area-menu-one-button').attr('transform', 'translate(20,' + (10 + iButton * 27) + ')');
+                var rect = gbut.insert("rect").attr('class', 'button').attr('x', 0).attr('y', 0).attr('width', 80).attr('rx', 5).attr('ry', 5).attr('height', 22);
+                gbut.append('text').attr("x", 40).attr("y", 11).text(text);
                 self.buttons[name] = {
                     el: gbut,
                     isShowing: fIsShowing,
                     action: fAction
                 };
-                var gOver = gbut.insert("rect").attr('class', 'over-button').attr('x', 0).attr('y', 0).attr('width', 50).attr('rx', 5).attr('ry', 5).attr('height', 22);
+                var gOver = gbut.insert("rect").attr('class', 'over-button').attr('x', 0).attr('y', 0).attr('width', 80).attr('rx', 5).attr('ry', 5).attr('height', 22);
                 gbut.on('click', fAction);
 
                 gbut.style('display', fIsShowing() ? null : 'none');
                 iButton++;
             }
-            fctAddButton('zoomOut', 'reset', function () {
+            fctAddButton('zoomOut', 'zoom out', function () {
                 return self.model.isXZoomed();
             }, function () {
                 self.model.reset();

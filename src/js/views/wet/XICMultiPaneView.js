@@ -45,6 +45,27 @@ define(['jquery', 'underscore', 'Backbone', 'd3', '../commons/CommonWidgetView',
 
                 self.listenTo(self.model, 'add', self.setup);
                 self.listenTo(self.model, 'reset', self.clear);
+
+                self.p_set_selectedRange();
+                self.setShiftSelectCallback(function(xs){
+                    self.selectRange(xs);
+                    self.scalingContext.setRangeSelected(true);
+                });
+            },
+
+                    // prepare the plot of the range when selecting an area
+            p_set_selectedRange: function () {
+                var self = this;
+                cont = self.el.append('g');
+                cont.attr('class selectedRange');
+                var highlightRectangle = cont.append('rect');
+                this.highlightRectangle = highlightRectangle;
+            },
+
+            selectRange: function (rtRange) {
+                var self = this;
+                this.selectedRange = rtRange;
+                this.render();
             },
 
             p_init_rt_domain_selector: function (cb) {
@@ -282,6 +303,19 @@ define(['jquery', 'underscore', 'Backbone', 'd3', '../commons/CommonWidgetView',
 
                 if (self.legendIsDisplayed) {
                     self.renderLegend();
+                }
+
+                // draw a box indicating the selected range
+                if(self.selectedRange){                   
+                    var x = self.scalingContext.x();//d3.scale.linear().domain(self.scalingContext.xScale.domain()).range(self.scalingContext.xScale.range())
+                    var y = self.scalingContext.y();//d3.scale.linear().domain(self.scalingContext.yScale.domain()).range(self.scalingContext.yScale.range())
+    
+                    var rectWidth = x(self.selectedRange[1]) - x(self.selectedRange[0]);        
+
+                    self.highlightRectangle.attr('style', 'fill:purple;fill-opacity:0.3;pointer-events:none');
+                    self.highlightRectangle.attr('width', rectWidth);
+                    self.highlightRectangle.attr('height', self.height());
+                    self.highlightRectangle.attr('transform', 'translate(' + x(self.selectedRange[0]) + ',' + 0 + ')').style('left', x + 'px').style('left', y + 'px').style('position', 'relative');
                 }
 
             }

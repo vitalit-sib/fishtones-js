@@ -13740,6 +13740,7 @@ define('fishtones/views/utils/D3ScalingContext',['d3', 'underscore', 'Backbone']
       self._xDomain[1] = self._xOrigDomain[1];
       self._yDomain[0] = self._yOrigDomain[0];
       self._yDomain[1] = self._yOrigDomain[1];
+
       if (changed) {
         self.trigger('scalechange', 'reset');
       }
@@ -13755,7 +13756,6 @@ define('fishtones/views/utils/D3ScalingContext',['d3', 'underscore', 'Backbone']
         self.trigger('scalechange', 'resetX');
       }
       return self;
-
       //self.fireChangeXRange();
     },
     resetY : function() {
@@ -13856,6 +13856,14 @@ define('fishtones/views/utils/D3ScalingContext',['d3', 'underscore', 'Backbone']
       }
       self.fireChangeXDomain();
       return self;
+    },
+    isRangeSelected : function(){
+      var self = this;
+      return self._rangeSelected;
+    },
+    setRangeSelected : function(rangeSelected){
+      var self = this;
+      self._rangeSelected = rangeSelected;
     },
     isXZoomed : function() {
       var self = this;
@@ -14095,6 +14103,7 @@ define('fishtones/views/commons/CommonWidgetView',['underscore', 'Backbone', 'd3
             height : self._height,
             width : self._width
           });
+          self.scalingContext.setRangeSelected(false);
         }
 
         if (options.xDomain) {
@@ -14146,6 +14155,7 @@ define('fishtones/views/commons/CommonWidgetView',['underscore', 'Backbone', 'd3
       self.setBrushCallback(DOUBLE_CLICK, function(xs) {
         self.scalingContext.reset()
       })
+
     },
 
     setShiftSelectCallback : function(f) {
@@ -18972,6 +18982,7 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
         p_clazzCommon: function () {
             return 'chromato msms-alignment-icon charge_' + this.model.get('charge') + ' target_' + this.model.get('target');
         },
+
         //package the ms1 graph point (and get dtat ready for drawing)
         p_set_ms1points: function () {
             var self = this;
@@ -19065,12 +19076,14 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
             msms.widget.move(x(msms.retentionTime), Math.min(y(msms.intensity), self.scalingContext.height() - 15))
         });
 
+        // draw red line indicating Rt of selected value
         if(self.selRt){
-            self.selRtWidget.attr('stroke', "red").attr('stroke-width', 1);
+            self.selRtWidget.attr('stroke', 'red').attr('stroke-width', 1);
             self.selRtWidget.attr('x1', 0).attr('x2', 0).attr('y1', 0).attr('y2', self.scalingContext.height());
             self.selRtWidget.attr('transform', 'translate(' + x(self.selRt) + ',' + 0 + ')').style('left', x + 'px').style('left', y + 'px').style('position', 'relative');
         }
-        // var ms2points = _.zip(chrm.msms.retentionTimes, chrm.msms.intensities, chrm.msms.spectraIds);
+
+
     }
 
     return XICView;
@@ -19325,6 +19338,27 @@ define('fishtones/views/wet/XICMultiPaneView',['jquery', 'underscore', 'Backbone
 
                 self.listenTo(self.model, 'add', self.setup);
                 self.listenTo(self.model, 'reset', self.clear);
+
+                self.p_set_selectedRange();
+                self.setShiftSelectCallback(function(xs){
+                    self.selectRange(xs);
+                    self.scalingContext.setRangeSelected(true);
+                });
+            },
+
+                    // prepare the plot of the range when selecting an area
+            p_set_selectedRange: function () {
+                var self = this;
+                cont = self.el.append('g');
+                cont.attr('class selectedRange');
+                var highlightRectangle = cont.append('rect');
+                this.highlightRectangle = highlightRectangle;
+            },
+
+            selectRange: function (rtRange) {
+                var self = this;
+                this.selectedRange = rtRange;
+                this.render();
             },
 
             p_init_rt_domain_selector: function (cb) {
@@ -19562,6 +19596,19 @@ define('fishtones/views/wet/XICMultiPaneView',['jquery', 'underscore', 'Backbone
 
                 if (self.legendIsDisplayed) {
                     self.renderLegend();
+                }
+
+                // draw a box indicating the selected range
+                if(self.selectedRange){                   
+                    var x = self.scalingContext.x();//d3.scale.linear().domain(self.scalingContext.xScale.domain()).range(self.scalingContext.xScale.range())
+                    var y = self.scalingContext.y();//d3.scale.linear().domain(self.scalingContext.yScale.domain()).range(self.scalingContext.yScale.range())
+    
+                    var rectWidth = x(self.selectedRange[1]) - x(self.selectedRange[0]);        
+
+                    self.highlightRectangle.attr('style', 'fill:purple;fill-opacity:0.3;pointer-events:none');
+                    self.highlightRectangle.attr('width', rectWidth);
+                    self.highlightRectangle.attr('height', self.height());
+                    self.highlightRectangle.attr('transform', 'translate(' + x(self.selectedRange[0]) + ',' + 0 + ')').style('left', x + 'px').style('left', y + 'px').style('position', 'relative');
                 }
 
             }

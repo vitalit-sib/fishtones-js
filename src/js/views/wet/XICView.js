@@ -31,6 +31,7 @@ define(['underscore', 'Backbone', 'd3', '../commons/CommonWidgetView', 'fishtone
         p_clazzCommon: function () {
             return 'chromato msms-alignment-icon charge_' + this.model.get('charge') + ' target_' + this.model.get('target');
         },
+
         //package the ms1 graph point (and get dtat ready for drawing)
         p_set_ms1points: function () {
             var self = this;
@@ -124,12 +125,14 @@ define(['underscore', 'Backbone', 'd3', '../commons/CommonWidgetView', 'fishtone
             msms.widget.move(x(msms.retentionTime), Math.min(y(msms.intensity), self.scalingContext.height() - 15))
         });
 
+        // draw red line indicating Rt of selected value
         if(self.selRt){
-            self.selRtWidget.attr('stroke', "red").attr('stroke-width', 1);
+            self.selRtWidget.attr('stroke', 'red').attr('stroke-width', 1);
             self.selRtWidget.attr('x1', 0).attr('x2', 0).attr('y1', 0).attr('y2', self.scalingContext.height());
             self.selRtWidget.attr('transform', 'translate(' + x(self.selRt) + ',' + 0 + ')').style('left', x + 'px').style('left', y + 'px').style('position', 'relative');
         }
-        // var ms2points = _.zip(chrm.msms.retentionTimes, chrm.msms.intensities, chrm.msms.spectraIds);
+
+
     }
 
     return XICView;
