@@ -148,7 +148,6 @@ define(['underscore', 'Backbone', 'd3', '../commons/CommonWidgetView', 'fishtone
         
         if(peak){
             self.selInt.attr('x', x(peak[0])).attr('y', self.scalingContext.height()/2).text(peak[1].toExponential(2));
-            console.log(peak);
         }else{
             self.selInt.attr('x', 0).attr('y', 0).text(undefined);
         }
