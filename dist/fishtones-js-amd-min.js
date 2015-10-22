@@ -5964,7 +5964,6 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
                 self.p_set_msmsdata();
             }
             self.p_set_selectedRt();
-            self.p_set_selectedIntensity();
 
             return self;
         },
@@ -6008,17 +6007,6 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
             self.selRtWidget = rtBar;
             self.selRt = selRt;
 
-        },
-        // indicate the selected Intesity with a text
-        p_set_selectedIntensity: function(){
-            var self = this;
-            var selRt = self.model.get('selected');
-            
-            cont = self.el.append('g');
-            cont.attr('class', self.p_clazzCommon() + ' selInt');
-    
-            // add an empty text
-            self.selInt = cont.append('text');
         },
         p_set_msmsdata: function () {
             var self = this;
@@ -6082,15 +6070,6 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
             self.selRtWidget.attr('stroke', 'red').attr('stroke-width', 1);
             self.selRtWidget.attr('x1', 0).attr('x2', 0).attr('y1', 0).attr('y2', self.scalingContext.height());
             self.selRtWidget.attr('transform', 'translate(' + x(self.selRt) + ',' + 0 + ')').style('left', x + 'px').style('left', y + 'px').style('position', 'relative');
-        }
-
-        var peak = self.model.get('selected');
-        
-        if(peak){
-            self.selInt.attr('x', x(peak[0])).attr('y', self.scalingContext.height()/2).text(peak[1].toExponential(2));
-            console.log(peak);
-        }else{
-            self.selInt.attr('x', 0).attr('y', 0).text(undefined);
         }
 
     }
