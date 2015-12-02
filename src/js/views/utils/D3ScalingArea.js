@@ -40,7 +40,7 @@ define(['underscore', 'd3', 'Backbone', './D3ScalingAreaButtons'], function (_, 
             var g = self.container.insert("g", ":first-child")
             //var rect = g.insert("rect", ":first-child").attr('x', 0).attr('y', 0).attr('width', '100%').attr('height', '100%').attr('fill-opacity', '0%').attr('class', 'zoom-area');
 
-            self.p_setup_buttons();
+            //self.p_setup_buttons();
 
             // self.zoom = d3.behavior.zoom().x(self.context.xScale).scaleExtent([1, 180]).on("zoom", function() {
             // self.callback();
