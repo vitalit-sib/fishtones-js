@@ -19316,6 +19316,7 @@ define('fishtones/views/wet/XICMultiPaneView',['jquery', 'underscore', 'Backbone
                 MultiXICView.__super__.initialize.call(this, options);
 
                 self.groupBy = options.groupBy;
+                self.orderBy = options.orderBy;
                 self.getGroupName = options.getGroupName || self.groupBy;
                 self.retentionTimeSelectCallback = options.retentionTimeSelectCallback;
 
@@ -19460,6 +19461,17 @@ define('fishtones/views/wet/XICMultiPaneView',['jquery', 'underscore', 'Backbone
                     });
                     self.setupZoom();
 
+                }
+
+                // if the orderBy option was set and has the same length as the loaded data, we do the sorting
+                if(self.orderBy && typeof self.groupBy === "function" && rep4panes.length == self.orderBy.length){
+                    console.log("order!");
+                    // create an object for ordering
+                    var orderObject = {};
+                    _.each(self.orderBy, function(x, i) {orderObject[x] = i;});
+
+                    // sort the rep4panes
+                    rep4panes = _.sortBy(rep4panes, function(x){return orderObject[self.groupBy(x)];});
                 }
 
                 //create panes if there are necessary

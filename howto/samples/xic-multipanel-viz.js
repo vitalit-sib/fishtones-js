@@ -22,7 +22,8 @@ var xicCol = new fishtones.wet.XICCollection();
 var multiPanes = new fishtones.wet.XICMultiPaneView({
   el: '#xic-multipanel-viz',
   model: xicCol,
-  groupBy: groupFunction
+  groupBy: groupFunction,
+  orderBy: ['c1001', 'c670', 'c697', 'c984']
 })
 
 new fishtones.wet.Injection({id: 42}).fetch({
@@ -43,6 +44,7 @@ new fishtones.wet.Injection({id: 42}).fetch({
           });
         });
       });
+
     }
   }
 );
