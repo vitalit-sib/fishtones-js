@@ -13,7 +13,7 @@
 
     <target name="package" depends="bundle-clean,bundle-css,build-library-bundle,build-library-amd"/>
 
-    <target name="dist" depends="package,dist-src,dist-dist"/>
+    <target name="dist" depends="package,dist-src,dist-dist,build-howto"/>
     <target name="dist-src">
         <mkdir dir="${targetDir}/dist"/>
         <tar destfile="${dist.src.archive}"
@@ -85,6 +85,9 @@
     <target name="bundle-clean">
         <delete failonerror="false" dir="dist"/>
         <mkdir dir="dist"/>
+    </target>
+    <target name="build-howto">
+        <copy file="dist/fishtones-js-bundle-min.js" tofile="howto/lib/fishtones-js-bundle-min.js"/>
     </target>
 
     <!-- we prefere hard copy the third party dependencies into the example dir to make it standalone-->
