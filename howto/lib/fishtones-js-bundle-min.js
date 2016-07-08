@@ -18960,12 +18960,20 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
                 options.yDomain = [0, _.max(self.model.get('intensities')) * 1.1];
             }
             self.setupScalingContext(options);
-            self.p_set_ms1points();
+            
         
             if (self.richSequence) {
                 self.p_set_msmsdata();
             }
+
+            // prepare the rtBars
+            if(self.model.get('precursors')){
+                self.p_set_rtBars();
+            }
+
             self.p_set_selectedRt();
+
+            self.p_set_ms1points();
 
             return self;
         },
@@ -18974,7 +18982,7 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
             return 'chromato msms-alignment-icon charge_' + this.model.get('charge') + ' target_' + this.model.get('target');
         },
 
-        //package the ms1 graph point (and get dtat ready for drawing)
+        //package the ms1 graph point (and get data ready for drawing)
         p_set_ms1points: function () {
             var self = this;
             var chromato = self.model;
@@ -18990,6 +18998,27 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
             var clazz = self.p_clazzCommon() + ' plot';
             //console.log('adding ms1point', ms1points)
             self.p1 = cont.selectAll("path." + clazz).data([chromato._dataPoints]).enter().insert("path");
+        },
+        // set the fragmentation events as lines instead of PQ's
+        p_set_rtBars: function () {
+            var self = this;
+            var precursors = self.model.get('precursors');
+
+            var barHeight = self.scalingContext.height();
+
+            self.precursorData = _.map(precursors, function(prec){
+                var widget = new MatchMapRtBarView({
+                                    model: prec,
+                                    el: self.el,
+                                    barHeight   :barHeight
+                                });
+
+                return {widget: widget, retentionTime: prec.retentionTime};
+            });
+
+            _.each(self.precursorData, function(precData){
+                precData.widget.render();
+            });
         },
         // indicate the selected Rt as a red line
         p_set_selectedRt: function () {
@@ -19055,16 +19084,20 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
         var x = self.scalingContext.x();    //d3.scale.linear().domain(self.scalingContext.xScale.domain()).range(self.scalingContext.xScale.range())
         var y = self.scalingContext.y();    //d3.scale.linear().domain(self.scalingContext.yScale.domain()).range(self.scalingContext.yScale.range())
 
+        _.each(self.precursorData, function(prec){
+            prec.widget.move(x(prec.retentionTime), 0);
+        })
+
         var pLine = d3.svg.line().x(function (d) {
             return x(d[0]);
         }).y(function (d) {
-            return y(d[1])
+            return y(d[1]);
         });
 
         var gp1 = self.p1.attr('class', clazz).attr('fill', 'none');
         gp1.attr("d", pLine(self.model._dataPoints));
         _.each(self.msmsData, function (msms) {
-            msms.widget.move(x(msms.retentionTime), Math.min(y(msms.intensity), self.scalingContext.height() - 15))
+            msms.widget.move(x(msms.retentionTime), Math.min(y(msms.intensity), self.scalingContext.height() - 15));
         });
 
         // draw red line indicating Rt of selected value
@@ -19465,7 +19498,6 @@ define('fishtones/views/wet/XICMultiPaneView',['jquery', 'underscore', 'Backbone
 
                 // if the orderBy option was set and has the same length as the loaded data, we do the sorting
                 if(self.orderBy && typeof self.groupBy === "function" && rep4panes.length == self.orderBy.length){
-                    console.log("order!");
                     // create an object for ordering
                     var orderObject = {};
                     _.each(self.orderBy, function(x, i) {orderObject[x] = i;});
@@ -22929,6 +22961,131 @@ define('fishtones/views/match/SpectraPairAlignmentIcon',['underscore', 'd3', '..
     return SpectraPairAlignmentIcon;
 
 });
+/*
+ * Precursor peak for a MSMS spectrum
+ *
+ * Copyright (c) 2016, SIB
+ * All rights reserved.
+ * Author: Roman Mylonas SIB Switzerland
+ */
+
+
+define('fishtones/models/match/PrecursorPeak',['jquery', 'underscore', 'Backbone'], function ($, _, Backbone) {
+
+    return Backbone.Model.extend({
+        initialize: function (options) {
+            var self = this;
+        }
+    });
+});
+
+/**
+ * Instead of the PQ we're showing a simple bar at the position of a MSMS event
+ *
+ * Copyright (c) 2016, SIB
+ * All rights reserved.
+ * Author: Roman Mylonas, SIB Switzerland
+ */
+
+define('fishtones/views/utils/RtBarView',['underscore', 'd3'], function(_, d3) {
+
+  RtBarView = function(target, options) {
+
+    options = $.extend({}, options);
+    this.barHeight = options.barHeight || 50;
+    this.lineStroke = 1;
+    this.onLineStroke = 4;
+    this.onclickCallback = options.onclickCallback;
+    this.mouseoverCallback = options.mouseoverCallback;
+    this.mouseoutCallback = options.mouseoutCallback;
+
+    if ( typeof target == 'object') {
+      this.vis = target.append('g');
+    } else {
+      this.vis = d3.select(target).append('g');
+    }
+  }
+
+  RtBarView.prototype.build = function(sectorClasses, rectBuildFunction) {
+    var self = this;
+    self.len = sectorClasses.length;
+    self.sectorClasses = sectorClasses;
+  }
+
+  RtBarView.prototype.draw = function(options) {
+    var self = this;
+
+    var myLine = self.vis.append('line').attr('x1', 1).attr('x2', 1).attr('y1', 1).attr('y2', self.barHeight).attr('stroke', 'green').attr('stroke-width', self.lineStroke);
+    myLine.style("cursor", "pointer");
+
+    myLine.on('mouseover', function(){ 
+      myLine.attr('stroke-width', self.onLineStroke);
+      self.mouseoverCallback();
+    });
+
+    myLine.on('mouseout', function() {
+      myLine.attr('stroke-width', self.lineStroke);
+      self.mouseoutCallback();
+    });
+    
+    myLine.on('click', self.onclickCallback);
+  }
+
+  RtBarView.prototype.move = function(x, y) {
+    var self = this;
+    this.vis.attr('transform', 'translate(' + (x) + ',' + (y) + ')').style('left', x + 'px').style('left', y + 'px').style('position', 'relative');
+    return this
+  }
+
+  return RtBarView;
+});
+
+/*
+ * the disk with unrolled peptide coverage for PSM
+ *
+ * Copyright (c) 2013-2014, Genentech Inc.
+ * All rights reserved.
+ * Author: Alexandre Masselot, Bioinformatics & Computational Biology Department, Genentech
+ */
+
+define('fishtones/views/match/MatchMapRtBarView',['underscore', 'Backbone', '../commons/CommonWidgetView', 'fishtones/views/utils/RtBarView'], function(_, Backbone, CommonWidgetView, RtBarView) {
+
+    MatchMapRtBarView = CommonWidgetView.extend({
+        initialize : function(options) {
+            var self = this;
+            MatchMapRtBarView.__super__.initialize.call(this, arguments)
+
+            self.barHeight = options.barHeight|| 50;
+            this.onclickCallback = options.onclickCallback;
+            this.mouseoverCallback = options.mouseoverCallback;
+            this.mouseoutCallback = options.mouseoutCallback;
+
+            var spma = self.model;
+
+            var widget = new RtBarView(self.el, {
+                barHeight : self.barHeight,
+                onclickCallback : this.onclickCallback,
+                mouseoutCallback: this.mouseoutCallback,
+                mouseoverCallback: this.mouseoverCallback
+            });
+           
+            self.widgetRtBar = widget;
+        },
+
+        render : function() {
+            var self = this;
+            self.widgetRtBar.draw();
+        },
+
+        move : function(i, j) {
+            this.widgetRtBar.move(i, j);
+        }
+    });
+
+    return MatchMapRtBarView;
+});
+
+
 /**
  * wrapp all exposed function handlers and prototypes
  *
@@ -22947,7 +23104,7 @@ define('fishtones/views/match/SpectraPairAlignmentIcon',['underscore', 'd3', '..
     var exported = {
         wet: ['Config', 'fishtones/models/wet/ExpMSMSSpectrum', 'fishtones/collections/wet/ExpMSMSSpectrumCollection', 'fishtones/models/wet/MSMSRun', 'fishtones/models/wet/Injection', 'fishtones/models/wet/Experiment', 'fishtones/collections/wet/XICCollection', 'fishtones/views/wet/XICView', 'fishtones/models/wet/XIC', 'fishtones/views/wet/MultiXICView', 'fishtones/views/wet/XICMultiPaneView', 'fishtones/views/wet/SpectrumView'],
         dry: ['fishtones/models/dry/RichSequence', 'fishtones/services/dry/ImplicitModifier', 'fishtones/services/dry/MassBuilder', 'fishtones/services/dry/RichSequenceShortcuter', 'fishtones/collections/dry/ResidueModificationDictionary', 'fishtones/collections/dry/AminoAcidDictionary', 'fishtones/views/dry/forms/RichSequenceInput', 'fishtones/views/dry/TheoOnSequenceView'],
-        match: ['fishtones/models/match/SpectraPairAlignment', 'fishtones/views/match/SpectraPairAlignmentView', 'fishtones/models/match/PSMAlignment', 'fishtones/views/match/MatchSpectrumView', 'fishtones/views/match/MatchGridValuesView', 'fishtones/views/match/MatchMapPQView', 'fishtones/views/match/MatchMapSlimView', 'fishtones/views/match/SpectraPairAlignmentIcon'],
+        match: ['fishtones/models/match/SpectraPairAlignment', 'fishtones/views/match/SpectraPairAlignmentView', 'fishtones/models/match/PSMAlignment', 'fishtones/views/match/MatchSpectrumView', 'fishtones/views/match/MatchGridValuesView', 'fishtones/views/match/MatchMapPQView', 'fishtones/views/match/MatchMapSlimView', 'fishtones/views/match/SpectraPairAlignmentIcon', 'fishtones/models/match/PrecursorPeak', 'fishtones/views/utils/RtBarView', 'fishtones/views/match/MatchMapRtBarView'],
         utils: ['fishtones/views/utils/D3ScalingContext', 'fishtones/utils/DeltaMass']
     }
 
@@ -22989,7 +23146,7 @@ define('fishtones/views/match/SpectraPairAlignmentIcon',['underscore', 'd3', '..
         'jquery',
         'Config', 'fishtones/models/wet/ExpMSMSSpectrum', 'fishtones/collections/wet/ExpMSMSSpectrumCollection', 'fishtones/models/wet/MSMSRun', 'fishtones/models/wet/Injection', 'fishtones/models/wet/Experiment', 'fishtones/collections/wet/XICCollection', 'fishtones/views/wet/XICView', 'fishtones/models/wet/XIC', 'fishtones/views/wet/MultiXICView', 'fishtones/views/wet/XICMultiPaneView', 'fishtones/views/wet/SpectrumView',
         'fishtones/models/dry/RichSequence', 'fishtones/services/dry/ImplicitModifier', 'fishtones/services/dry/MassBuilder', 'fishtones/services/dry/RichSequenceShortcuter', 'fishtones/collections/dry/ResidueModificationDictionary', 'fishtones/collections/dry/AminoAcidDictionary', 'fishtones/views/dry/forms/RichSequenceInput', 'fishtones/views/dry/TheoOnSequenceView',
-        'fishtones/models/match/SpectraPairAlignment', 'fishtones/views/match/SpectraPairAlignmentView', 'fishtones/models/match/PSMAlignment', 'fishtones/views/match/MatchSpectrumView', 'fishtones/views/match/MatchGridValuesView', 'fishtones/views/match/MatchMapPQView', 'fishtones/views/match/MatchMapSlimView', 'fishtones/views/match/SpectraPairAlignmentIcon',
+        'fishtones/models/match/SpectraPairAlignment', 'fishtones/views/match/SpectraPairAlignmentView', 'fishtones/models/match/PSMAlignment', 'fishtones/views/match/MatchSpectrumView', 'fishtones/views/match/MatchGridValuesView', 'fishtones/views/match/MatchMapPQView', 'fishtones/views/match/MatchMapSlimView', 'fishtones/views/match/SpectraPairAlignmentIcon', 'fishtones/models/match/PrecursorPeak', 'fishtones/views/utils/RtBarView', 'fishtones/views/match/MatchMapRtBarView',
         'fishtones/views/utils/D3ScalingContext', 'fishtones/utils/DeltaMass',
     ], buildExport);
 

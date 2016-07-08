@@ -18,12 +18,20 @@ define(['underscore', 'Backbone', 'd3', '../commons/CommonWidgetView', 'fishtone
                 options.yDomain = [0, _.max(self.model.get('intensities')) * 1.1];
             }
             self.setupScalingContext(options);
-            self.p_set_ms1points();
+            
         
             if (self.richSequence) {
                 self.p_set_msmsdata();
             }
+
+            // prepare the rtBars
+            if(self.model.get('precursors')){
+                self.p_set_rtBars();
+            }
+
             self.p_set_selectedRt();
+
+            self.p_set_ms1points();
 
             return self;
         },
@@ -32,7 +40,7 @@ define(['underscore', 'Backbone', 'd3', '../commons/CommonWidgetView', 'fishtone
             return 'chromato msms-alignment-icon charge_' + this.model.get('charge') + ' target_' + this.model.get('target');
         },
 
-        //package the ms1 graph point (and get dtat ready for drawing)
+        //package the ms1 graph point (and get data ready for drawing)
         p_set_ms1points: function () {
             var self = this;
             var chromato = self.model;
@@ -48,6 +56,27 @@ define(['underscore', 'Backbone', 'd3', '../commons/CommonWidgetView', 'fishtone
             var clazz = self.p_clazzCommon() + ' plot';
             //console.log('adding ms1point', ms1points)
             self.p1 = cont.selectAll("path." + clazz).data([chromato._dataPoints]).enter().insert("path");
+        },
+        // set the fragmentation events as lines instead of PQ's
+        p_set_rtBars: function () {
+            var self = this;
+            var precursors = self.model.get('precursors');
+
+            var barHeight = self.scalingContext.height();
+
+            self.precursorData = _.map(precursors, function(prec){
+                var widget = new MatchMapRtBarView({
+                                    model: prec,
+                                    el: self.el,
+                                    barHeight   :barHeight
+                                });
+
+                return {widget: widget, retentionTime: prec.retentionTime};
+            });
+
+            _.each(self.precursorData, function(precData){
+                precData.widget.render();
+            });
         },
         // indicate the selected Rt as a red line
         p_set_selectedRt: function () {
@@ -113,16 +142,20 @@ define(['underscore', 'Backbone', 'd3', '../commons/CommonWidgetView', 'fishtone
         var x = self.scalingContext.x();    //d3.scale.linear().domain(self.scalingContext.xScale.domain()).range(self.scalingContext.xScale.range())
         var y = self.scalingContext.y();    //d3.scale.linear().domain(self.scalingContext.yScale.domain()).range(self.scalingContext.yScale.range())
 
+        _.each(self.precursorData, function(prec){
+            prec.widget.move(x(prec.retentionTime), 0);
+        })
+
         var pLine = d3.svg.line().x(function (d) {
             return x(d[0]);
         }).y(function (d) {
-            return y(d[1])
+            return y(d[1]);
         });
 
         var gp1 = self.p1.attr('class', clazz).attr('fill', 'none');
         gp1.attr("d", pLine(self.model._dataPoints));
         _.each(self.msmsData, function (msms) {
-            msms.widget.move(x(msms.retentionTime), Math.min(y(msms.intensity), self.scalingContext.height() - 15))
+            msms.widget.move(x(msms.retentionTime), Math.min(y(msms.intensity), self.scalingContext.height() - 15));
         });
 
         // draw red line indicating Rt of selected value
