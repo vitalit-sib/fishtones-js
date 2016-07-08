@@ -10,11 +10,12 @@ new fishtones.wet.Injection({id: 42}).fetch({
     success: function (inj) {
       inj.chromatoXic(fishtones.dry.MassBuilder.computeMassRichSequence(peptide,3), {
         success: function (xic) {
-          var precursors = _.map(xic.get('msmsPointers'), function(x){return {retentionTime: x.retentionTime}});
+          
           // replace msmsPointers by precursors to show the bars
+          var precursors = _.map(xic.get('msmsPointers'), function(x){return {retentionTime: x.retentionTime}});
           xic.set('precursors', precursors);
           xic.unset('msmsPointers');
-          console.log(xic);
+          
           var v = new fishtones.wet.XICView({
             model       : xic,
             el          : '#xic-rtbar-viz'

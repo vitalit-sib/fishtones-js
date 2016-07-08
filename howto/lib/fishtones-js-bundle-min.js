@@ -19085,7 +19085,8 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
         var y = self.scalingContext.y();    //d3.scale.linear().domain(self.scalingContext.yScale.domain()).range(self.scalingContext.yScale.range())
 
         _.each(self.precursorData, function(prec){
-            prec.widget.move(x(prec.retentionTime), 0);
+            // we also have to adjust the heigth (3th parameter) because we're adding one pane after the other
+            prec.widget.move(x(prec.retentionTime), 0, self.scalingContext.height());
         })
 
         var pLine = d3.svg.line().x(function (d) {
@@ -23015,24 +23016,31 @@ define('fishtones/views/utils/RtBarView',['underscore', 'd3'], function(_, d3) {
   RtBarView.prototype.draw = function(options) {
     var self = this;
 
-    var myLine = self.vis.append('line').attr('x1', 1).attr('x2', 1).attr('y1', 1).attr('y2', self.barHeight).attr('stroke', 'green').attr('stroke-width', self.lineStroke);
+    var myLine = self.vis.append('line').attr('x1', 0).attr('x2', 0).attr('y1', 0).attr('y2', self.barHeight).attr('stroke', 'green').attr('stroke-width', self.lineStroke);
     myLine.style("cursor", "pointer");
 
     myLine.on('mouseover', function(){ 
       myLine.attr('stroke-width', self.onLineStroke);
-      self.mouseoverCallback();
+      if(self.mouseoverCallback){
+        self.mouseoverCallback();
+      }
     });
 
     myLine.on('mouseout', function() {
       myLine.attr('stroke-width', self.lineStroke);
-      self.mouseoutCallback();
+      if(self.mouseoutCallback){
+        self.mouseoutCallback();
+      }
     });
     
-    myLine.on('click', self.onclickCallback);
+    if(self.onclickCallback){
+      myLine.on('click', self.onclickCallback);
+    }
   }
 
-  RtBarView.prototype.move = function(x, y) {
+  RtBarView.prototype.move = function(x, y, height) {
     var self = this;
+    this.vis.selectAll('line').attr('x1', 0).attr('x2', 0).attr('y1', 0).attr('y2', height);
     this.vis.attr('transform', 'translate(' + (x) + ',' + (y) + ')').style('left', x + 'px').style('left', y + 'px').style('position', 'relative');
     return this
   }
@@ -23077,8 +23085,8 @@ define('fishtones/views/match/MatchMapRtBarView',['underscore', 'Backbone', '../
             self.widgetRtBar.draw();
         },
 
-        move : function(i, j) {
-            this.widgetRtBar.move(i, j);
+        move : function(i, j, h) {
+            this.widgetRtBar.move(i, j, h);
         }
     });
 

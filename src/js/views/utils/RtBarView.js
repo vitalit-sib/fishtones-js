@@ -34,24 +34,31 @@ define(['underscore', 'd3'], function(_, d3) {
   RtBarView.prototype.draw = function(options) {
     var self = this;
 
-    var myLine = self.vis.append('line').attr('x1', 1).attr('x2', 1).attr('y1', 1).attr('y2', self.barHeight).attr('stroke', 'green').attr('stroke-width', self.lineStroke);
+    var myLine = self.vis.append('line').attr('x1', 0).attr('x2', 0).attr('y1', 0).attr('y2', self.barHeight).attr('stroke', 'green').attr('stroke-width', self.lineStroke);
     myLine.style("cursor", "pointer");
 
     myLine.on('mouseover', function(){ 
       myLine.attr('stroke-width', self.onLineStroke);
-      self.mouseoverCallback();
+      if(self.mouseoverCallback){
+        self.mouseoverCallback();
+      }
     });
 
     myLine.on('mouseout', function() {
       myLine.attr('stroke-width', self.lineStroke);
-      self.mouseoutCallback();
+      if(self.mouseoutCallback){
+        self.mouseoutCallback();
+      }
     });
     
-    myLine.on('click', self.onclickCallback);
+    if(self.onclickCallback){
+      myLine.on('click', self.onclickCallback);
+    }
   }
 
-  RtBarView.prototype.move = function(x, y) {
+  RtBarView.prototype.move = function(x, y, height) {
     var self = this;
+    this.vis.selectAll('line').attr('x1', 0).attr('x2', 0).attr('y1', 0).attr('y2', height);
     this.vis.attr('transform', 'translate(' + (x) + ',' + (y) + ')').style('left', x + 'px').style('left', y + 'px').style('position', 'relative');
     return this
   }

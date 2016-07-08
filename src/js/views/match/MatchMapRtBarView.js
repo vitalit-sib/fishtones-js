@@ -35,8 +35,8 @@ define(['underscore', 'Backbone', '../commons/CommonWidgetView', 'fishtones/view
             self.widgetRtBar.draw();
         },
 
-        move : function(i, j) {
-            this.widgetRtBar.move(i, j);
+        move : function(i, j, h) {
+            this.widgetRtBar.move(i, j, h);
         }
     });
 

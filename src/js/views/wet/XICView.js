@@ -143,7 +143,8 @@ define(['underscore', 'Backbone', 'd3', '../commons/CommonWidgetView', 'fishtone
         var y = self.scalingContext.y();    //d3.scale.linear().domain(self.scalingContext.yScale.domain()).range(self.scalingContext.yScale.range())
 
         _.each(self.precursorData, function(prec){
-            prec.widget.move(x(prec.retentionTime), 0);
+            // we also have to adjust the heigth (3th parameter) because we're adding one pane after the other
+            prec.widget.move(x(prec.retentionTime), 0, self.scalingContext.height());
         })
 
         var pLine = d3.svg.line().x(function (d) {
