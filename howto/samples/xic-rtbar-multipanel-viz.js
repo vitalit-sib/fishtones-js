@@ -26,6 +26,9 @@ var multiPanes = new fishtones.wet.XICMultiPaneView({
   orderBy: ['c1001', 'c670', 'c697', 'c984']
 })
 
+// we only want one source precursor.
+var firstPrec = true;
+
 new fishtones.wet.Injection({id: 42}).fetch({
     success: function (inj) {
       //loop over the peptides
@@ -40,7 +43,20 @@ new fishtones.wet.Injection({id: 42}).fetch({
             target      : iPept
           }, function (x) {
             // replace msmsPointers by precursors to show the bars
-            var precursors = _.map(x.get('msmsPointers'), function(x){return {retentionTime: x.retentionTime}});
+            var precursors = _.map(x.get('msmsPointers'), function(x){
+              var isSource = false;
+
+              if(firstPrec){
+                isSource = true;
+                firstPrec = false;
+              }
+
+              var pp = new fishtones.match.PrecursorPeak({
+                  retentionTime: x.retentionTime,
+                  isSource: isSource
+              });
+              return pp;
+            });
             x.set('precursors', precursors);
             x.unset('msmsPointers');
           

@@ -70,8 +70,7 @@ define(['underscore', 'Backbone', 'd3', '../commons/CommonWidgetView', 'fishtone
                                     el: self.el,
                                     barHeight   :barHeight
                                 });
-
-                return {widget: widget, retentionTime: prec.retentionTime};
+                return {widget: widget, retentionTime: prec.get('retentionTime')};
             });
 
             _.each(self.precursorData, function(precData){

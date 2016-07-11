@@ -19012,8 +19012,8 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
                                     el: self.el,
                                     barHeight   :barHeight
                                 });
-
-                return {widget: widget, retentionTime: prec.retentionTime};
+                console.log(prec);
+                return {widget: widget, retentionTime: prec.get('retentionTime')};
             });
 
             _.each(self.precursorData, function(precData){
@@ -22993,9 +22993,9 @@ define('fishtones/views/utils/RtBarView',['underscore', 'd3'], function(_, d3) {
   RtBarView = function(target, options) {
 
     options = $.extend({}, options);
-    this.barHeight = options.barHeight || 50;
     this.lineStroke = 1;
     this.onLineStroke = 4;
+    this.isSource = options.isSource;
     this.onclickCallback = options.onclickCallback;
     this.mouseoverCallback = options.mouseoverCallback;
     this.mouseoutCallback = options.mouseoutCallback;
@@ -23016,7 +23016,9 @@ define('fishtones/views/utils/RtBarView',['underscore', 'd3'], function(_, d3) {
   RtBarView.prototype.draw = function(options) {
     var self = this;
 
-    var myLine = self.vis.append('line').attr('x1', 0).attr('x2', 0).attr('y1', 0).attr('y2', self.barHeight).attr('stroke', 'green').attr('stroke-width', self.lineStroke);
+    var barColor = (self.isSource) ? ('red') : ('green');
+
+    var myLine = self.vis.append('line').attr('x1', 0).attr('x2', 0).attr('y1', 0).attr('y2', 1).attr('stroke', barColor).attr('stroke-width', self.lineStroke);
     myLine.style("cursor", "pointer");
 
     myLine.on('mouseover', function(){ 
@@ -23063,19 +23065,20 @@ define('fishtones/views/match/MatchMapRtBarView',['underscore', 'Backbone', '../
             var self = this;
             MatchMapRtBarView.__super__.initialize.call(this, arguments)
 
-            self.barHeight = options.barHeight|| 50;
             this.onclickCallback = options.onclickCallback;
             this.mouseoverCallback = options.mouseoverCallback;
             this.mouseoutCallback = options.mouseoutCallback;
 
             var spma = self.model;
 
-            var widget = new RtBarView(self.el, {
-                barHeight : self.barHeight,
+            var widgetOptions = {
+                isSource: spma.get('isSource'),
                 onclickCallback : this.onclickCallback,
                 mouseoutCallback: this.mouseoutCallback,
                 mouseoverCallback: this.mouseoverCallback
-            });
+            };
+
+            var widget = new RtBarView(self.el, widgetOptions);
            
             self.widgetRtBar = widget;
         },
