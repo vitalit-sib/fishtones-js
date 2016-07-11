@@ -37,7 +37,6 @@ new fishtones.wet.Injection({id: 42}).fetch({
         _.each([2, 3], function (z) {
           var moz = fishtones.dry.MassBuilder.computeMassRichSequence(pept, z);
           inj.chromatoXic(moz, {
-            selectedRt       : 1800.0,
             charge      : z,
             //richSequence: pept,
             target      : iPept
@@ -60,7 +59,6 @@ new fishtones.wet.Injection({id: 42}).fetch({
             x.set('precursors', precursors);
             x.unset('msmsPointers');
           
-            console.log(x);
             x.set('id', x.get('mass'));
             xicCol.add(x);
           });

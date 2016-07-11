@@ -18971,8 +18971,6 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
                 self.p_set_rtBars();
             }
 
-            self.p_set_selectedRt();
-
             self.p_set_ms1points();
 
             return self;
@@ -19012,32 +19010,12 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
                                     el: self.el,
                                     barHeight   :barHeight
                                 });
-                console.log(prec);
                 return {widget: widget, retentionTime: prec.get('retentionTime')};
             });
 
             _.each(self.precursorData, function(precData){
                 precData.widget.render();
             });
-        },
-        // indicate the selected Rt as a red line
-        p_set_selectedRt: function () {
-            var self = this;
-            var selRt = self.model.get('selectedRt');
-            
-            var rtBar = undefined;
-
-            if(selRt){
-                cont = self.el.append('g');
-                cont.attr('class', self.p_clazzCommon() + ' rtBar');
-    
-                // add an empty line for the rtBar
-                rtBar = cont.append('line');
-            }
-
-            self.selRtWidget = rtBar;
-            self.selRt = selRt;
-
         },
         p_set_msmsdata: function () {
             var self = this;
@@ -19100,13 +19078,6 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
         _.each(self.msmsData, function (msms) {
             msms.widget.move(x(msms.retentionTime), Math.min(y(msms.intensity), self.scalingContext.height() - 15));
         });
-
-        // draw red line indicating Rt of selected value
-        if(self.selRt){
-            self.selRtWidget.attr('stroke', 'red').attr('stroke-width', 1);
-            self.selRtWidget.attr('x1', 0).attr('x2', 0).attr('y1', 0).attr('y2', self.scalingContext.height());
-            self.selRtWidget.attr('transform', 'translate(' + x(self.selRt) + ',' + 0 + ')').style('left', x + 'px').style('left', y + 'px').style('position', 'relative');
-        }
 
     }
 
