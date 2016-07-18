@@ -19,7 +19,8 @@ define(['underscore', 'Backbone', 'd3', '../commons/CommonWidgetView', 'fishtone
             }
             self.setupScalingContext(options);
             
-        
+            self.p_set_ms1points();
+
             if (self.richSequence) {
                 self.p_set_msmsdata();
             }
@@ -28,8 +29,6 @@ define(['underscore', 'Backbone', 'd3', '../commons/CommonWidgetView', 'fishtone
             if(self.model.get('precursors')){
                 self.p_set_rtBars();
             }
-
-            self.p_set_ms1points();
 
             return self;
         },

@@ -29,8 +29,11 @@ define(['jquery', 'underscore', 'Backbone', 'd3', '../commons/CommonWidgetView',
 
             initialize: function (options) {
                 var self = this;
+
+                self.mousemoveCallback = options.mousemoveCallback;
+
                 options = _.extend({}, options);
-                MultiXICView.__super__.initialize.call(this, options);
+                MultiXICView.__super__.initialize.call(self, options);
 
                 self.groupBy = options.groupBy;
                 self.orderBy = options.orderBy;
@@ -53,6 +56,14 @@ define(['jquery', 'underscore', 'Backbone', 'd3', '../commons/CommonWidgetView',
                     self.getMaxWithinRange(xs);
                     self.selectRange(xs);
                 });
+
+                // set the mousemovement callback
+                if(self.mousemoveCallback){
+                  Backbone.on("fishtonesmousemovement", function(coordinates){
+                      self.mousemoveCallback(coordinates);
+                  });      
+                }
+
             },
             // prepare the plot of the range when selecting an area
             p_set_selectedRange: function () {

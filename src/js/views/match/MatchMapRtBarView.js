@@ -11,19 +11,16 @@ define(['underscore', 'Backbone', '../commons/CommonWidgetView', 'fishtones/view
     MatchMapRtBarView = CommonWidgetView.extend({
         initialize : function(options) {
             var self = this;
-            MatchMapRtBarView.__super__.initialize.call(this, arguments)
-
-            this.onclickCallback = options.onclickCallback;
-            this.mouseoverCallback = options.mouseoverCallback;
-            this.mouseoutCallback = options.mouseoutCallback;
 
             var spma = self.model;
 
+            MatchMapRtBarView.__super__.initialize.call(self, arguments)
+
             var widgetOptions = {
                 isSource: spma.get('isSource'),
-                onclickCallback : this.onclickCallback,
-                mouseoutCallback: this.mouseoutCallback,
-                mouseoverCallback: this.mouseoverCallback
+                onclickCallback : spma.get('onclickCallback'),
+                mouseoutCallback: spma.get('mouseoutCallback'),
+                mouseoverCallback: spma.get('mouseoverCallback')
             };
 
             var widget = new RtBarView(self.el, widgetOptions);

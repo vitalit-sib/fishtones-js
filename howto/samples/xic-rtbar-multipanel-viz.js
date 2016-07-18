@@ -23,7 +23,8 @@ var multiPanes = new fishtones.wet.XICMultiPaneView({
   el: '#xic-rtbar-multipanel-viz',
   model: xicCol,
   groupBy: groupFunction,
-  orderBy: ['c1001', 'c670', 'c697', 'c984']
+  orderBy: ['c1001', 'c670', 'c697', 'c984'],
+  mousemoveCallback: function(coordinates) { console.log('multipane: ' + coordinates[0] + ' : ' + coordinates[1]); }
 })
 
 // we only want one source precursor.

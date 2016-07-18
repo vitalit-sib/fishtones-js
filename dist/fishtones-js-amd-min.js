@@ -1062,6 +1062,14 @@ define('fishtones/views/commons/CommonWidgetView',['underscore', 'Backbone', 'd3
         self._width = options.width || $(elTmp).width() || 200;
       }
 
+      // send an event if there was a callback for the mousemovements
+      if(this.mousemoveCallback){
+        self.el.on('mousemove', function () {      
+          var coordinates = d3.mouse(self.el[0][0]);
+          Backbone.trigger("fishtonesmousemovement", coordinates);
+        });
+      }
+
     },
     height : function(v) {
       if (v !== undefined) {
@@ -5959,7 +5967,8 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
             }
             self.setupScalingContext(options);
             
-        
+            self.p_set_ms1points();
+
             if (self.richSequence) {
                 self.p_set_msmsdata();
             }
@@ -5968,8 +5977,6 @@ define('fishtones/views/wet/XICView',['underscore', 'Backbone', 'd3', '../common
             if(self.model.get('precursors')){
                 self.p_set_rtBars();
             }
-
-            self.p_set_ms1points();
 
             return self;
         },
@@ -6315,8 +6322,11 @@ define('fishtones/views/wet/XICMultiPaneView',['jquery', 'underscore', 'Backbone
 
             initialize: function (options) {
                 var self = this;
+
+                self.mousemoveCallback = options.mousemoveCallback;
+
                 options = _.extend({}, options);
-                MultiXICView.__super__.initialize.call(this, options);
+                MultiXICView.__super__.initialize.call(self, options);
 
                 self.groupBy = options.groupBy;
                 self.orderBy = options.orderBy;
@@ -6339,6 +6349,14 @@ define('fishtones/views/wet/XICMultiPaneView',['jquery', 'underscore', 'Backbone
                     self.getMaxWithinRange(xs);
                     self.selectRange(xs);
                 });
+
+                // set the mousemovement callback
+                if(self.mousemoveCallback){
+                  Backbone.on("fishtonesmousemovement", function(coordinates){
+                      self.mousemoveCallback(coordinates);
+                  });      
+                }
+
             },
             // prepare the plot of the range when selecting an area
             p_set_selectedRange: function () {
@@ -8647,11 +8665,12 @@ define('fishtones/views/utils/RtBarView',['underscore', 'd3'], function(_, d3) {
 
     options = $.extend({}, options);
     this.lineStroke = 1;
-    this.onLineStroke = 4;
+    this.onLineStroke = 5;
     this.isSource = options.isSource;
     this.onclickCallback = options.onclickCallback;
     this.mouseoverCallback = options.mouseoverCallback;
     this.mouseoutCallback = options.mouseoutCallback;
+    this.mousemoveCallback = options.mousemoveCallback;
 
     if ( typeof target == 'object') {
       this.vis = target.append('g');
@@ -8716,19 +8735,16 @@ define('fishtones/views/match/MatchMapRtBarView',['underscore', 'Backbone', '../
     MatchMapRtBarView = CommonWidgetView.extend({
         initialize : function(options) {
             var self = this;
-            MatchMapRtBarView.__super__.initialize.call(this, arguments)
-
-            this.onclickCallback = options.onclickCallback;
-            this.mouseoverCallback = options.mouseoverCallback;
-            this.mouseoutCallback = options.mouseoutCallback;
 
             var spma = self.model;
 
+            MatchMapRtBarView.__super__.initialize.call(self, arguments)
+
             var widgetOptions = {
                 isSource: spma.get('isSource'),
-                onclickCallback : this.onclickCallback,
-                mouseoutCallback: this.mouseoutCallback,
-                mouseoverCallback: this.mouseoverCallback
+                onclickCallback : spma.get('onclickCallback'),
+                mouseoutCallback: spma.get('mouseoutCallback'),
+                mouseoverCallback: spma.get('mouseoverCallback')
             };
 
             var widget = new RtBarView(self.el, widgetOptions);

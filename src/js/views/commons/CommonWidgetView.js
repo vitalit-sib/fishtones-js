@@ -36,6 +36,14 @@ define(['underscore', 'Backbone', 'd3', '../utils/D3ScalingContext', '../utils/D
         self._width = options.width || $(elTmp).width() || 200;
       }
 
+      // send an event if there was a callback for the mousemovements
+      if(this.mousemoveCallback){
+        self.el.on('mousemove', function () {      
+          var coordinates = d3.mouse(self.el[0][0]);
+          Backbone.trigger("fishtonesmousemovement", coordinates);
+        });
+      }
+
     },
     height : function(v) {
       if (v !== undefined) {

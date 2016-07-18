@@ -12,11 +12,12 @@ define(['underscore', 'd3'], function(_, d3) {
 
     options = $.extend({}, options);
     this.lineStroke = 1;
-    this.onLineStroke = 4;
+    this.onLineStroke = 5;
     this.isSource = options.isSource;
     this.onclickCallback = options.onclickCallback;
     this.mouseoverCallback = options.mouseoverCallback;
     this.mouseoutCallback = options.mouseoutCallback;
+    this.mousemoveCallback = options.mousemoveCallback;
 
     if ( typeof target == 'object') {
       this.vis = target.append('g');
