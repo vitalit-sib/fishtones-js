@@ -14,6 +14,7 @@ define(['underscore', 'd3'], function(_, d3) {
     this.lineStroke = 1;
     this.onLineStroke = 5;
     this.isSource = options.isSource;
+    this.isIdentified = options.isIdentified;
     this.onclickCallback = options.onclickCallback;
     this.mouseoverCallback = options.mouseoverCallback;
     this.mouseoutCallback = options.mouseoutCallback;
@@ -35,7 +36,9 @@ define(['underscore', 'd3'], function(_, d3) {
   RtBarView.prototype.draw = function(options) {
     var self = this;
 
-    var barColor = (self.isSource) ? ('red') : ('green');
+    var barColor = 'green';
+    if(self.isSource) barColor = 'red';
+    if(! self.isIdentified) barColor = 'lightgrey';
 
     var myLine = self.vis.append('line').attr('x1', 0).attr('x2', 0).attr('y1', 0).attr('y2', 1).attr('stroke', barColor).attr('stroke-width', self.lineStroke);
     myLine.style("cursor", "pointer");

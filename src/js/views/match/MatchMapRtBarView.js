@@ -18,6 +18,7 @@ define(['underscore', 'Backbone', '../commons/CommonWidgetView', 'fishtones/view
 
             var widgetOptions = {
                 isSource: spma.get('isSource'),
+                isIdentified: spma.get('isIdentified'),
                 onclickCallback : spma.get('onclickCallback'),
                 mouseoutCallback: spma.get('mouseoutCallback'),
                 mouseoverCallback: spma.get('mouseoverCallback')
