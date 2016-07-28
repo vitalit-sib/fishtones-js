@@ -8691,7 +8691,7 @@ define('fishtones/views/utils/RtBarView',['underscore', 'd3'], function(_, d3) {
 
     var barColor = 'green';
     if(self.isSource) barColor = 'red';
-    if(! self.isIdentified) barColor = 'lightgrey';
+    if(! self.isIdentified) barColor = 'silver';
 
     var myLine = self.vis.append('line').attr('x1', 0).attr('x2', 0).attr('y1', 0).attr('y2', 1).attr('stroke', barColor).attr('stroke-width', self.lineStroke);
     myLine.style("cursor", "pointer");
