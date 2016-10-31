@@ -126,6 +126,10 @@ svg.d3-widget-match-spectrum line.peak.frag-series-b{
     stroke: #00f;
 }
 
+svg.d3-widget-match-spectrum line.peak.frag-series-98{
+    stroke: orange;
+}
+
 svg.d3-widget-match-spectrum rect.peak-baseline {
     fill: #d4d9f9;
     fill-opacity: 0.80;

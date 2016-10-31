@@ -101,12 +101,23 @@ define(['jquery', 'underscore', 'Backbone', 'fishtones/utils/DeltaMass'], functi
             return this.matchIndices();
         },
         /**
-         * @ return the list of matches closer than a given tolerance
+         * @ return the list of matches closer than a given tolerance in pmm
          */
         closerThanPPM: function (tol) {
             var self = this;
             var m = _.filter(self.get('matches'), function (m) {
                 return (Math.abs(m.errorPPM) < tol)
+            });
+            return m
+        },
+
+        /**
+         * @ return the list of matches closer than a given tolerance in Dalton
+         */
+        closerThanDalton: function (tol) {
+            var self = this;
+            var m = _.filter(self.get('matches'), function (m) {
+                return (Math.abs(m.exp.moz - m.theo.moz) < tol)
             });
             return m
         }

@@ -23,6 +23,7 @@ define(['jquery', 'underscore', 'Backbone', 'fishtones/services/dry/MassBuilder'
 
             self.set('richSequence', options.richSequence);
             self.set('expSpectrum', options.expSpectrum);
+            self.set('annotatePhospho', options.annotatePhospho);
 
             self.build()
 
@@ -44,7 +45,7 @@ define(['jquery', 'underscore', 'Backbone', 'fishtones/services/dry/MassBuilder'
         build : function() {
             var self = this;
 
-            self.set('theoSpectrum', massBuilder.computeTheoSpectrum(self.get('richSequence')));
+            self.set('theoSpectrum', massBuilder.computeTheoSpectrum(self.get('richSequence'), self.get('annotatePhospho')));
 
             self.set('pklA', self.get('theoSpectrum'))
             self.set('pklB', self.get('expSpectrum'))

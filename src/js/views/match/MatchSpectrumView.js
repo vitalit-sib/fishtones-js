@@ -17,6 +17,7 @@ define(['underscore', 'd3', '../commons/CommonWidgetView', 'fishtones/views/util
             options = $.extend({}, options);
             self.options = options;
 
+            self.tolUnity = options.tolUnity || 'ppm';
             self.tol = options.tol || 500;
 
             self.heightXAxis = 21;
@@ -89,7 +90,8 @@ define(['underscore', 'd3', '../commons/CommonWidgetView', 'fishtones/views/util
             self.d3holderPeaks = svgsp.selectAll('line.peak').data(self.data.peaks).enter().append('line').attr('class', function (pk) {
                 var clazz = 'peak';
                 if (pk.label !== undefined) {
-                    clazz += ' matched frag-series-' + pk.label.label.series.replace('++', '')
+                    var label = pk.label.label.series.indexOf('98') > -1 ? '98' : pk.label.label.series.replace('++', '');
+                    clazz += ' matched frag-series-' + label;
                 } else {
                     clazz += ' unmatched'
                 }
@@ -238,7 +240,7 @@ define(['underscore', 'd3', '../commons/CommonWidgetView', 'fishtones/views/util
             var expSp = self.model.get('expSpectrum');
 
             var ret = {};
-            var dmatches = self.model.closerThanPPM(self.tol)
+            var dmatches = (self.tolUnity === 'dalton') ? self.model.closerThanDalton(self.tol) : self.model.closerThanPPM(self.tol)
 
             var labeledPeaks = [];
             ret.labels = _.collect(dmatches, function (dm) {

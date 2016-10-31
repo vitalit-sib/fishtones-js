@@ -4460,6 +4460,7 @@ define('fishtones/services/dry/MassBuilder',['jquery', 'underscore', 'Backbone',
   var MASS_OH = 15.994914622 + 1.007825032// cterm
   var MASS_H = 1.007825032// nterm
   var MASS_HPLUS = 1.007276466812
+  var MASS_PHOSPHO = 97.976
 
   /**
    * private contstructor
@@ -4586,7 +4587,7 @@ define('fishtones/services/dry/MassBuilder',['jquery', 'underscore', 'Backbone',
    * compute the theoretical mass spectrum. b, b++, y, y++
    * @return a theoretical spectrum
    */
-  function computeTheoSpectrum(richSeq) {
+  function computeTheoSpectrum(richSeq, annotatePhospho) {
     var rawMasses = [computeMassModifArray(richSeq.get('nTermModifications'))].concat(_.collect(richSeq.get('sequence'), computeMassRichAA));
     var n = rawMasses.length;
     for ( i = 1; i < n; i++) {
@@ -4594,8 +4595,10 @@ define('fishtones/services/dry/MassBuilder',['jquery', 'underscore', 'Backbone',
     }
     var mtot = rawMasses[n - 1];
 
+    var fraqSeries = (annotatePhospho) ? ['b', 'b++', 'y', 'y++', 'b-98', 'b-98++', 'y-98', 'y-98++'] : ['b', 'b++', 'y', 'y++'];
+
     var theoSp = new TheoSpectrum({
-      fragSeries : ['b', 'b++', 'y', 'y++'],
+      fragSeries : fraqSeries,
       lenSeq : richSeq.size(),
       peaks : [],
       richSequence : richSeq
@@ -4606,39 +4609,73 @@ define('fishtones/services/dry/MassBuilder',['jquery', 'underscore', 'Backbone',
       var rm = rawMasses[i];
       //            console.log(rm, i)
       peaks.push({
-        label : 'b' + i,
+        label : 'b(' + i + ')',
         series : 'b',
         moz : rm + MASS_HPLUS,
         pos : i - 1
       });
       peaks.push({
-        label : 'b++' + i,
+        label : 'b(' + i + ')++',
         series : 'b++',
         moz : rm / 2 + MASS_HPLUS,
         pos : i - 1
       });
+      if(annotatePhospho){
+        peaks.push({
+          label : 'b(' + i + ')-98',
+          series : 'b-98',
+          moz : rm + MASS_HPLUS - MASS_PHOSPHO,
+          pos : i - 1
+        });
+        peaks.push({
+          label : 'b(' + i + ')-98++',
+          series : 'b-98++',
+          moz : rm / 2 + MASS_HPLUS - (MASS_PHOSPHO/2),
+          pos : i - 1
+        });
+      }
     }
 
     var mcterminus = computeMassModifArray(richSeq.get('cTermModifications'))
     for ( i = 0; i < rawMasses.length; i++) {
+
       var ym = mtot - rawMasses[i] + MASS_OH + MASS_H + mcterminus;
       if ((i == rawMasses.length - 1 ) && ym < 100) {
         break;
       }
 
       peaks.push({
-        label : 'y' + (n - i - 1),
+        label : 'y(' + (n - i - 1) + ')',
         series : 'y',
         moz : ym + MASS_HPLUS,
         pos : i
       });
       peaks.push({
-        label : 'y++' + (n - i - 1),
+        label : 'y(' + (n - i - 1) + ')++',
         series : 'y++',
         moz : ym / 2 + MASS_HPLUS,
         pos : i
       });
+
+      if(annotatePhospho){
+
+      peaks.push({
+          label : 'y(' + (n - i - 1) + ')-98',
+          series : 'y-98',
+          moz : ym + MASS_HPLUS - MASS_PHOSPHO,
+          pos : i
+        });
+        peaks.push({
+          label : 'y(' + (n - i - 1) + ')-98++',
+          series : 'y-98++',
+          moz : ym / 2 + MASS_HPLUS - (MASS_PHOSPHO / 2),
+          pos : i
+        });
     }
+
+    }
+    
+
     peaks.sort(function(a, b) {
       return a.moz - b.moz
     });
@@ -4815,12 +4852,23 @@ define('fishtones/models/match/PeakListPairAlignment',['jquery', 'underscore', '
             return this.matchIndices();
         },
         /**
-         * @ return the list of matches closer than a given tolerance
+         * @ return the list of matches closer than a given tolerance in pmm
          */
         closerThanPPM: function (tol) {
             var self = this;
             var m = _.filter(self.get('matches'), function (m) {
                 return (Math.abs(m.errorPPM) < tol)
+            });
+            return m
+        },
+
+        /**
+         * @ return the list of matches closer than a given tolerance in Dalton
+         */
+        closerThanDalton: function (tol) {
+            var self = this;
+            var m = _.filter(self.get('matches'), function (m) {
+                return (Math.abs(m.exp.moz - m.theo.moz) < tol)
             });
             return m
         }
@@ -4852,6 +4900,7 @@ define('fishtones/models/match/PSMAlignment',['jquery', 'underscore', 'Backbone'
 
             self.set('richSequence', options.richSequence);
             self.set('expSpectrum', options.expSpectrum);
+            self.set('annotatePhospho', options.annotatePhospho);
 
             self.build()
 
@@ -4873,7 +4922,7 @@ define('fishtones/models/match/PSMAlignment',['jquery', 'underscore', 'Backbone'
         build : function() {
             var self = this;
 
-            self.set('theoSpectrum', massBuilder.computeTheoSpectrum(self.get('richSequence')));
+            self.set('theoSpectrum', massBuilder.computeTheoSpectrum(self.get('richSequence'), self.get('annotatePhospho')));
 
             self.set('pklA', self.get('theoSpectrum'))
             self.set('pklB', self.get('expSpectrum'))
@@ -5504,6 +5553,7 @@ define('fishtones/views/match/MatchSpectrumView',['underscore', 'd3', '../common
             options = $.extend({}, options);
             self.options = options;
 
+            self.tolUnity = options.tolUnity || 'ppm';
             self.tol = options.tol || 500;
 
             self.heightXAxis = 21;
@@ -5576,7 +5626,8 @@ define('fishtones/views/match/MatchSpectrumView',['underscore', 'd3', '../common
             self.d3holderPeaks = svgsp.selectAll('line.peak').data(self.data.peaks).enter().append('line').attr('class', function (pk) {
                 var clazz = 'peak';
                 if (pk.label !== undefined) {
-                    clazz += ' matched frag-series-' + pk.label.label.series.replace('++', '')
+                    var label = pk.label.label.series.indexOf('98') > -1 ? '98' : pk.label.label.series.replace('++', '');
+                    clazz += ' matched frag-series-' + label;
                 } else {
                     clazz += ' unmatched'
                 }
@@ -5725,7 +5776,7 @@ define('fishtones/views/match/MatchSpectrumView',['underscore', 'd3', '../common
             var expSp = self.model.get('expSpectrum');
 
             var ret = {};
-            var dmatches = self.model.closerThanPPM(self.tol)
+            var dmatches = (self.tolUnity === 'dalton') ? self.model.closerThanDalton(self.tol) : self.model.closerThanPPM(self.tol)
 
             var labeledPeaks = [];
             ret.labels = _.collect(dmatches, function (dm) {
