@@ -5598,9 +5598,23 @@ define('fishtones/views/match/MatchSpectrumView',['underscore', 'd3', '../common
             var hSpectrum = self.height() - 20 - self.heightXAxis;
 
             self.p_build_data();
+
+            // check size of highest y position (peak + label)
+            var maxPeakInt = _.max(_.pluck(self.data.peaks, 'y'));
+            var yHeightFactor = 0
+            // the estimated hight of one character relative to total hight
+            var labelCharSize = 0.18;
+
+            for(i=0; i < self.data.peaks.length; i++){
+                var iLabel = _.find(self.data.labels, function(x){ return x.label.pos === i });
+                var labelLength = iLabel ? iLabel.label.label.length : 0;
+                var localHF = self.data.peaks[i].y / maxPeakInt + labelLength * labelCharSize;
+                if(localHF > yHeightFactor) yHeightFactor = localHF;
+            }
+
             self.setupScalingContext({
                 xDomain: [expSp.get('mozs')[0] * 0.95, expSp.get('mozs')[expSp.size() - 1] * 1.05],
-                yDomain: [0, _.max(_.pluck(self.data.peaks, 'y')) * 1.2],
+                yDomain: [0,  maxPeakInt * yHeightFactor],
                 height: hSpectrum - self.peaksBaselineHeight,
                 width: self.width()
             })
