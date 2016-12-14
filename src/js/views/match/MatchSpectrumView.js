@@ -67,7 +67,7 @@ define(['underscore', 'd3', '../commons/CommonWidgetView', 'fishtones/views/util
             var maxPeakInt = _.max(_.pluck(self.data.peaks, 'y'));
             var yHeightFactor = 0
             // the estimated hight of one character relative to total hight
-            var labelCharSize = 0.18;
+            var labelCharSize = 36/this.height();
 
             for(i=0; i < self.data.peaks.length; i++){
                 var iLabel = _.find(self.data.labels, function(x){ return x.label.pos === i });
