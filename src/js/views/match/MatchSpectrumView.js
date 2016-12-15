@@ -65,7 +65,7 @@ define(['underscore', 'd3', '../commons/CommonWidgetView', 'fishtones/views/util
 
             // check size of highest y position (peak + label)
             var maxPeakInt = _.max(_.pluck(self.data.peaks, 'y'));
-            var yHeightFactor = 0
+
             // the estimated hight of one character relative to total hight
             var labelCharSize = 15 / this.height();
             var labelDotLine = 60 / this.height();
@@ -104,7 +104,7 @@ define(['underscore', 'd3', '../commons/CommonWidgetView', 'fishtones/views/util
             self.d3holderPeaks = svgsp.selectAll('line.peak').data(self.data.peaks).enter().append('line').attr('class', function (pk) {
                 var clazz = 'peak';
                 if (pk.label !== undefined) {
-                    var label = pk.label.label.series.indexOf('98') > -1 ? '98' : pk.label.label.series.replace('++', '');
+                    var label = pk.label.label.series.replace('++', '');
                     clazz += ' matched frag-series-' + label;
                 } else {
                     clazz += ' unmatched'

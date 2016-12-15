@@ -145,7 +145,13 @@ define(['jquery', 'underscore', 'Backbone', 'fishtones/models/dry/RichSequence',
     }
     var mtot = rawMasses[n - 1];
 
-    var fraqSeries = (annotatePhospho) ? ['b', 'b++', 'y', 'y++', 'b-98', 'b-98++', 'y-98', 'y-98++'] : ['b', 'b++', 'y', 'y++'];
+    var fraqSeries = ['b', 'b++', 'y', 'y++'];
+
+    var NEUTRAL_LOSS_TAG = 98;
+    for(var p=1; p <= annotatePhospho; p++){
+      var lm = NEUTRAL_LOSS_TAG * p;
+      fraqSeries = fraqSeries.concat(['b-' + lm, 'b-' + lm + '++', 'y-' + lm, 'y-' + lm + '++']);
+    }
 
     var theoSp = new TheoSpectrum({
       fragSeries : fraqSeries,
@@ -170,17 +176,20 @@ define(['jquery', 'underscore', 'Backbone', 'fishtones/models/dry/RichSequence',
         moz : rm / 2 + MASS_HPLUS,
         pos : i - 1
       });
-      if(annotatePhospho){
-        peaks.push({
-          label : 'b(' + i + ')-98',
-          series : 'b-98',
-          moz : rm + MASS_HPLUS - MASS_PHOSPHO,
+
+      for(var p=1; p <= annotatePhospho; p++){
+          var lm = NEUTRAL_LOSS_TAG * p;
+
+          peaks.push({
+          label : 'b(' + i + ')-' + lm,
+          series : 'phospho',
+          moz : rm + MASS_HPLUS - MASS_PHOSPHO * p,
           pos : i - 1
         });
         peaks.push({
-          label : 'b(' + i + ')-98++',
-          series : 'b-98++',
-          moz : rm / 2 + MASS_HPLUS - (MASS_PHOSPHO/2),
+          label : 'b(' + i + ')-' + lm + '++',
+          series : 'phospho',
+          moz : rm / 2 + MASS_HPLUS - (MASS_PHOSPHO * p/2),
           pos : i - 1
         });
       }
@@ -207,21 +216,22 @@ define(['jquery', 'underscore', 'Backbone', 'fishtones/models/dry/RichSequence',
         pos : i
       });
 
-      if(annotatePhospho){
+     for(var p=1; p <= annotatePhospho; p++){
+          var lm = NEUTRAL_LOSS_TAG * p;
 
-      peaks.push({
-          label : 'y(' + (n - i - 1) + ')-98',
-          series : 'y-98',
-          moz : ym + MASS_HPLUS - MASS_PHOSPHO,
-          pos : i
-        });
         peaks.push({
-          label : 'y(' + (n - i - 1) + ')-98++',
-          series : 'y-98++',
-          moz : ym / 2 + MASS_HPLUS - (MASS_PHOSPHO / 2),
-          pos : i
-        });
-    }
+            label : 'y(' + (n - i - 1) + ')-' + lm,
+            series : 'phospho',
+            moz : ym + MASS_HPLUS - MASS_PHOSPHO * p,
+            pos : i
+          });
+          peaks.push({
+            label : 'y(' + (n - i - 1) + ')-' + lm + '++',
+            series : 'phospho',
+            moz : ym / 2 + MASS_HPLUS - (MASS_PHOSPHO * p / 2),
+            pos : i
+          });
+      }
 
     }
     

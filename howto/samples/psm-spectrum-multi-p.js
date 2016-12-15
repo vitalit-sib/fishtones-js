@@ -5,24 +5,26 @@
 fishtones.wet.Config.set('wet.url.rest', 'data-demo');
 
 var peptide = new fishtones.dry.RichSequence()
-    .fromString('MYQGAGGEAGGPGASGMDDDAPPASGGAGPK');
+    .fromString('DLHQPS{Phospho}LS{Phospho}PAS{Phospho}PHSQGFER');
 
 var fish;
 
-new fishtones.wet.ExpMSMSSpectrum({id: 'F004483_10873'})
+new fishtones.wet.ExpMSMSSpectrum({id: 'F003953_6861'})
+//new fishtones.wet.ExpMSMSSpectrum({id: 'K27Ac'})
   .fetch({
     success: function (sp) {
       var psm = new fishtones.match.PSMAlignment({
         richSequence: peptide,
         expSpectrum: sp,
-        annotatePhospho: false
+        annotatePhospho: 3
       });
 
       fish = new fishtones.match.MatchSpectrumView({
         model    : psm,
         el       : $('#target').find('#psm-viz'),
-        tol      : 500,
-        tolUnity : 'ppm',
+        //tol      : 300,
+        tol      : 0.02,
+        tolUnity : 'dalton',
         xZoomable: true
       });
       fish.render();

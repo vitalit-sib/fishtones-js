@@ -17,7 +17,7 @@ new fishtones.wet.ExpMSMSSpectrum({id: 'F004095_5787'})
       var psm = new fishtones.match.PSMAlignment({
         richSequence: peptide,
         expSpectrum: sp,
-        annotatePhospho: true
+        annotatePhospho: 1
       });
 
       fish = new fishtones.match.MatchSpectrumView({

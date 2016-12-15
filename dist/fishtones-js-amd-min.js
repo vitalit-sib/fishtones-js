@@ -4595,7 +4595,13 @@ define('fishtones/services/dry/MassBuilder',['jquery', 'underscore', 'Backbone',
     }
     var mtot = rawMasses[n - 1];
 
-    var fraqSeries = (annotatePhospho) ? ['b', 'b++', 'y', 'y++', 'b-98', 'b-98++', 'y-98', 'y-98++'] : ['b', 'b++', 'y', 'y++'];
+    var fraqSeries = ['b', 'b++', 'y', 'y++'];
+
+    var NEUTRAL_LOSS_TAG = 98;
+    for(var p=1; p <= annotatePhospho; p++){
+      var lm = NEUTRAL_LOSS_TAG * p;
+      fraqSeries = fraqSeries.concat(['b-' + lm, 'b-' + lm + '++', 'y-' + lm, 'y-' + lm + '++']);
+    }
 
     var theoSp = new TheoSpectrum({
       fragSeries : fraqSeries,
@@ -4620,17 +4626,20 @@ define('fishtones/services/dry/MassBuilder',['jquery', 'underscore', 'Backbone',
         moz : rm / 2 + MASS_HPLUS,
         pos : i - 1
       });
-      if(annotatePhospho){
-        peaks.push({
-          label : 'b(' + i + ')-98',
-          series : 'b-98',
-          moz : rm + MASS_HPLUS - MASS_PHOSPHO,
+
+      for(var p=1; p <= annotatePhospho; p++){
+          var lm = NEUTRAL_LOSS_TAG * p;
+
+          peaks.push({
+          label : 'b(' + i + ')-' + lm,
+          series : 'phospho',
+          moz : rm + MASS_HPLUS - MASS_PHOSPHO * p,
           pos : i - 1
         });
         peaks.push({
-          label : 'b(' + i + ')-98++',
-          series : 'b-98++',
-          moz : rm / 2 + MASS_HPLUS - (MASS_PHOSPHO/2),
+          label : 'b(' + i + ')-' + lm + '++',
+          series : 'phospho',
+          moz : rm / 2 + MASS_HPLUS - (MASS_PHOSPHO * p/2),
           pos : i - 1
         });
       }
@@ -4657,21 +4666,22 @@ define('fishtones/services/dry/MassBuilder',['jquery', 'underscore', 'Backbone',
         pos : i
       });
 
-      if(annotatePhospho){
+     for(var p=1; p <= annotatePhospho; p++){
+          var lm = NEUTRAL_LOSS_TAG * p;
 
-      peaks.push({
-          label : 'y(' + (n - i - 1) + ')-98',
-          series : 'y-98',
-          moz : ym + MASS_HPLUS - MASS_PHOSPHO,
-          pos : i
-        });
         peaks.push({
-          label : 'y(' + (n - i - 1) + ')-98++',
-          series : 'y-98++',
-          moz : ym / 2 + MASS_HPLUS - (MASS_PHOSPHO / 2),
-          pos : i
-        });
-    }
+            label : 'y(' + (n - i - 1) + ')-' + lm,
+            series : 'phospho',
+            moz : ym + MASS_HPLUS - MASS_PHOSPHO * p,
+            pos : i
+          });
+          peaks.push({
+            label : 'y(' + (n - i - 1) + ')-' + lm + '++',
+            series : 'phospho',
+            moz : ym / 2 + MASS_HPLUS - (MASS_PHOSPHO * p / 2),
+            pos : i
+          });
+      }
 
     }
     
@@ -5601,7 +5611,7 @@ define('fishtones/views/match/MatchSpectrumView',['underscore', 'd3', '../common
 
             // check size of highest y position (peak + label)
             var maxPeakInt = _.max(_.pluck(self.data.peaks, 'y'));
-            var yHeightFactor = 0
+
             // the estimated hight of one character relative to total hight
             var labelCharSize = 15 / this.height();
             var labelDotLine = 60 / this.height();
@@ -5640,7 +5650,7 @@ define('fishtones/views/match/MatchSpectrumView',['underscore', 'd3', '../common
             self.d3holderPeaks = svgsp.selectAll('line.peak').data(self.data.peaks).enter().append('line').attr('class', function (pk) {
                 var clazz = 'peak';
                 if (pk.label !== undefined) {
-                    var label = pk.label.label.series.indexOf('98') > -1 ? '98' : pk.label.label.series.replace('++', '');
+                    var label = pk.label.label.series.replace('++', '');
                     clazz += ' matched frag-series-' + label;
                 } else {
                     clazz += ' unmatched'
