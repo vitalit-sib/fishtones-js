@@ -278,16 +278,19 @@ define(['underscore', 'd3', '../commons/CommonWidgetView', 'fishtones/views/util
                 }
                 return pk;
             });
+
+            // truncate the highest peak if it is more then 3 times bigger than second
             ret.peaksTruncated = []
             var sortedIntensities = _.chain(ret.peaks).pluck('y').sort(function (a, b) {
                 return b - a
             }).value();
-            if (sortedIntensities[0] > 1.5 * sortedIntensities[1]) {
-                var maxIntens = sortedIntensities[1] * 1.1;
+            if (sortedIntensities[0] > 3 * sortedIntensities[1]) {
+                var maxIntens = sortedIntensities[1] * 1.2;
                 _.chain(ret.peaks).filter(function (p) {
                     return p.y > maxIntens
                 }).each(function (p) {
                     p.y = maxIntens;
+                    p.label.y = maxIntens;
                     ret.peaksTruncated.push(p);
                 });
             }

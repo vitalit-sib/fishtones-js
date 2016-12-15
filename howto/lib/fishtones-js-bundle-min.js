@@ -18605,7 +18605,6 @@ define('fishtones/views/match/MatchSpectrumView',['underscore', 'd3', '../common
             var maxPeakInt = _.max(_.pluck(self.data.peaks, 'y'));
             var yHeightFactor = 0
             // the estimated hight of one character relative to total hight
-            console.log(this.height());
             var labelCharSize = 36/this.height();
 
             for(i=0; i < self.data.peaks.length; i++){
@@ -18817,16 +18816,21 @@ define('fishtones/views/match/MatchSpectrumView',['underscore', 'd3', '../common
                 }
                 return pk;
             });
+
+            console.log(_.max(ret.peaks, function(x) {return x.y;}));
+
+            // truncate the highest peak if it is more then 3 times bigger than second
             ret.peaksTruncated = []
             var sortedIntensities = _.chain(ret.peaks).pluck('y').sort(function (a, b) {
                 return b - a
             }).value();
-            if (sortedIntensities[0] > 1.5 * sortedIntensities[1]) {
-                var maxIntens = sortedIntensities[1] * 1.1;
+            if (sortedIntensities[0] > 3 * sortedIntensities[1]) {
+                var maxIntens = sortedIntensities[1] * 1.2;
                 _.chain(ret.peaks).filter(function (p) {
                     return p.y > maxIntens
                 }).each(function (p) {
                     p.y = maxIntens;
+                    p.label.y = maxIntens;
                     ret.peaksTruncated.push(p);
                 });
             }
