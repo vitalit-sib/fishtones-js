@@ -67,18 +67,18 @@ define(['underscore', 'd3', '../commons/CommonWidgetView', 'fishtones/views/util
             var maxPeakInt = _.max(_.pluck(self.data.peaks, 'y'));
             var yHeightFactor = 0
             // the estimated hight of one character relative to total hight
-            var labelCharSize = 36/this.height();
+            var labelCharSize = 15 / this.height();
+            var labelDotLine = 60 / this.height();
 
-            for(i=0; i < self.data.peaks.length; i++){
-                var iLabel = _.find(self.data.labels, function(x){ return x.label.pos === i });
-                var labelLength = iLabel ? iLabel.label.label.length : 0;
-                var localHF = self.data.peaks[i].y / maxPeakInt + labelLength * labelCharSize;
-                if(localHF > yHeightFactor) yHeightFactor = localHF;
-            }
+            var yMaxHeight = _.max(_.map(self.data.peaks, function(p) {
+                var labelSize = p.label ? p.label.label.label.length * labelCharSize + labelDotLine : 0;
+                var peakSize = p.y / maxPeakInt;
+                return labelSize + peakSize;
+            }));
 
             self.setupScalingContext({
                 xDomain: [expSp.get('mozs')[0] * 0.95, expSp.get('mozs')[expSp.size() - 1] * 1.05],
-                yDomain: [0,  maxPeakInt * yHeightFactor],
+                yDomain: [0,  maxPeakInt * yMaxHeight],
                 height: hSpectrum - self.peaksBaselineHeight,
                 width: self.width()
             })
