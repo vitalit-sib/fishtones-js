@@ -290,7 +290,7 @@ define(['underscore', 'd3', '../commons/CommonWidgetView', 'fishtones/views/util
                     return p.y > maxIntens
                 }).each(function (p) {
                     p.y = maxIntens;
-                    p.label.y = maxIntens;
+                    if(p.label) p.label.y = maxIntens;
                     ret.peaksTruncated.push(p);
                 });
             }
