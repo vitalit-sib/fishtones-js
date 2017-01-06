@@ -23064,6 +23064,7 @@ define('fishtones/views/utils/RtBarView',['underscore', 'd3'], function(_, d3) {
     this.onLineStroke = 5;
     this.isSource = options.isSource;
     this.isIdentified = options.isIdentified;
+    this.sameChargeAsSource = options.sameChargeAsSource;
     this.onclickCallback = options.onclickCallback;
     this.mouseoverCallback = options.mouseoverCallback;
     this.mouseoutCallback = options.mouseoutCallback;
@@ -23085,9 +23086,10 @@ define('fishtones/views/utils/RtBarView',['underscore', 'd3'], function(_, d3) {
   RtBarView.prototype.draw = function(options) {
     var self = this;
 
-    var barColor = 'green';
+    var barColor = '#984ea3';
+    if(self.sameChargeAsSource) barColor = '#4daf4a';
     if(! self.isIdentified) barColor = 'silver';
-    if(self.isSource) barColor = 'red';
+    if(self.isSource) barColor = '#e41a1c';
 
     var myLine = self.vis.append('line').attr('x1', 0).attr('x2', 0).attr('y1', 0).attr('y2', 1).attr('stroke', barColor).attr('stroke-width', self.lineStroke);
     myLine.style("cursor", "pointer");
@@ -23142,6 +23144,7 @@ define('fishtones/views/match/MatchMapRtBarView',['underscore', 'Backbone', '../
             var widgetOptions = {
                 isSource: spma.get('isSource'),
                 isIdentified: spma.get('isIdentified'),
+                sameChargeAsSource: spma.get('sameChargeAsSource'),
                 onclickCallback : spma.get('onclickCallback'),
                 mouseoutCallback: spma.get('mouseoutCallback'),
                 mouseoverCallback: spma.get('mouseoverCallback')
