@@ -151,7 +151,7 @@ define(['underscore', 'd3', '../commons/CommonWidgetView', 'fishtones/views/util
             var self = this;
             // title
             var expSp = self.model.get('expSpectrum')
-            var title = 'scan: ' + expSp.get('scanNumber') + ' (' + (Math.round(expSp.get('retentionTime')) / 60).toFixed(1) + 'min) ' + expSp.get('precCharge') + '+ ' + expSp.get('precMoz').toFixed(4) + 'Da';
+            var title = 'scan: ' + expSp.get('scanNumber') + ' (' + (Math.round(expSp.get('retentionTime')) / 60).toFixed(1) + 'min) m/z: ' + expSp.get('precMoz').toFixed(4) + ' (' + expSp.get('precCharge') + '+)';
             self.vis.append('text').attr('x', 5).attr('y', 5).attr('class', 'title').text(title);
             self.vis.append('rect').attr('height', '20').attr('width', '100%').attr('class', 'title').text(title);
 
