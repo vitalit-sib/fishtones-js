@@ -1,6 +1,6 @@
 {
   "name": "fishtones",
-  "version": "0.1",
+  "version": "0.1.27",
   "description": "LC/MSMS libraries, dry, wet & match",
   "maintainers": [
     "Roman Mylonas <roman.mylonas@sib.swiss>"
