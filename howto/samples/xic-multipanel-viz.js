@@ -49,6 +49,16 @@ new fishtones.wet.Injection({id: 42}).fetch({
   }
 );
 
+$('#resetMultiXicButton')[0].onclick = function(){
+  console.log("reset xic");
+  multiPanes.scalingArea.model.reset();
+}
+
+$('#zoomMultiXicButton')[0].onclick = function(){
+  console.log("zoom xic");
+  multiPanes.zoomX([2600,2650]);
+}
+
 
 
 

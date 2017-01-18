@@ -102,25 +102,36 @@ define(['underscore', 'Backbone', 'd3', '../utils/D3ScalingContext', '../utils/D
         });
       })
     },
+
+
+    adaptYDomain : function(xs) {
+      var self = this;
+
+      if (!self.getMaxYInXDomain)
+        return
+      var ymax = self.getMaxYInXDomain(xs[0], xs[1]);
+
+      self.scalingContext.yDomain(0, ymax, {
+        silent : true
+      });
+    },
+
+    zoomX: function(xs) {
+      var self = this;
+
+      self.adaptYDomain(xs);
+      self.scalingContext.xDomain(xs);
+    },
+
     /**
      * add a D3ScalingAre, i.e. a x-zoomable area
      */
     xZoomable : function() {
       var self = this;
 
-      var adaptYDomain = function(xs) {
-        if (!self.getMaxYInXDomain)
-          return
-        var ymax = self.getMaxYInXDomain(xs[0], xs[1]);
-        self.scalingContext.yDomain(0, ymax, {
-          silent : true
-        });
-
-      }
-
       self.setupInteractive();
       self.setBrushCallback(KEYPRESSED_NONE, function(xs) {
-        adaptYDomain(xs)
+        self.adaptYDomain(xs)
         self.scalingContext.xDomain(xs)
       })
       self.setBrushCallback(DOUBLE_CLICK, function(xs) {

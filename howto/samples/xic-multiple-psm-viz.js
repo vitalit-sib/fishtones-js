@@ -50,5 +50,5 @@ new fishtones.wet.Injection({id: 42}).fetch({
 
     $('#zoomXicButton')[0].onclick = function(){
     console.log("zoom xic");
-    widget.scalingContext.xDomain([2000,3000]);
+    widget.scalingContext.xDomain([2600,2650]);
   }
