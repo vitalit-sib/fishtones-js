@@ -1,9 +1,9 @@
 {
   "name": "sib-fishtones-js",
-  "version": "0.1.10",
+  "version": "0.1.29",
   "authors": [
     "Alexandre Masselot <masselot.alexandre@gene.com>",
-    "Roman Mylonas <roman.mylonas@isb-sib.ch>"
+    "Roman Mylonas <roman.mylonas@sib.swiss>"
   ],
   "description": "LC/MSMS libraries, dry, wet & match",
     "main": [
