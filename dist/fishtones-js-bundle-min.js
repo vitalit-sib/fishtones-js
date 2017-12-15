@@ -14157,8 +14157,6 @@ define('fishtones/views/commons/CommonWidgetView',['underscore', 'Backbone', 'd3
     xZoomable : function() {
       var self = this;
 
-      self.scalingContext.zoomX = self.zoomX;
-
       self.setupInteractive();
       self.setBrushCallback(KEYPRESSED_NONE, function(xs) {
         self.adaptYDomain(xs)
@@ -14192,7 +14190,7 @@ define('fishtones/views/commons/CommonWidgetView',['underscore', 'Backbone', 'd3
       }
 
       var gBrush = (self.vis || self.el).insert('g', ':first-child').attr('class', 'x-selector');
-      gBrush.append('rect').attr('height', '100%').attr('width', '100%').attr('class', 'background');
+      self.gBrushBackground = gBrush.append('rect').attr('height', '100%').attr('width', '100%').attr('class', 'background');
       var leftHider = gBrush.append('rect').attr('class', 'hider left').attr('height', '100%').attr('width', 0).style('display', 'none');
       var rightHider = gBrush.append('rect').attr('class', 'hider right').attr('height', '100%').attr('width', '100%').style('display', 'none');
 
@@ -19565,7 +19563,7 @@ define('fishtones/views/wet/XICMultiPaneView',['jquery', 'underscore', 'Backbone
                         height: heightPane
                     });
                     var gxaxis = self.el.append('g').attr('class', 'time-scale xaxis').attr('transform', 'translate(0,' + (self.height() - self.heightXAxis) + ')');
-                    gxaxis.append('rect').attr('width', self.scalingContext.width()).attr('height', self.heightXAxis).attr('class', 'background');
+                    self.gxaxisBackground = gxaxis.append('rect').attr('width', self.scalingContext.width()).attr('height', self.heightXAxis).attr('class', 'background');
                     self.xaxisView = new D3XAxisView({
                         el: gxaxis.append('g'),
                         scalingContext: self.scalingContext,
@@ -19747,7 +19745,28 @@ define('fishtones/views/wet/XICMultiPaneView',['jquery', 'underscore', 'Backbone
 
                 }
 
+            },
+
+            resize: function (options) {
+                var self = this;
+
+                var h = options.height || 200;
+                self.height(h).width(options.width || 500);
+
+                self.scalingContext.width(self.width())
+
+                // put the titles to the right
+                Object.values(self.xicPanes).forEach(function(p){
+                  p.elTitle.attr('x', self.width());
+                });
+
+                // adapt the brush areas
+                self.gBrushBackground.attr('width', self.width());
+                self.gxaxisBackground.attr('width', self.width());
+
+                self.render();
             }
+
         });
 
         return XICMultiPaneView;

@@ -162,7 +162,7 @@ define(['underscore', 'Backbone', 'd3', '../utils/D3ScalingContext', '../utils/D
       }
 
       var gBrush = (self.vis || self.el).insert('g', ':first-child').attr('class', 'x-selector');
-      gBrush.append('rect').attr('height', '100%').attr('width', '100%').attr('class', 'background');
+      self.gBrushBackground = gBrush.append('rect').attr('height', '100%').attr('width', '100%').attr('class', 'background');
       var leftHider = gBrush.append('rect').attr('class', 'hider left').attr('height', '100%').attr('width', 0).style('display', 'none');
       var rightHider = gBrush.append('rect').attr('class', 'hider right').attr('height', '100%').attr('width', '100%').style('display', 'none');
 

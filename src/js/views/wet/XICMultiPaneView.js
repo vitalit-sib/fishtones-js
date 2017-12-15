@@ -179,7 +179,7 @@ define(['jquery', 'underscore', 'Backbone', 'd3', '../commons/CommonWidgetView',
                         height: heightPane
                     });
                     var gxaxis = self.el.append('g').attr('class', 'time-scale xaxis').attr('transform', 'translate(0,' + (self.height() - self.heightXAxis) + ')');
-                    gxaxis.append('rect').attr('width', self.scalingContext.width()).attr('height', self.heightXAxis).attr('class', 'background');
+                    self.gxaxisBackground = gxaxis.append('rect').attr('width', self.scalingContext.width()).attr('height', self.heightXAxis).attr('class', 'background');
                     self.xaxisView = new D3XAxisView({
                         el: gxaxis.append('g'),
                         scalingContext: self.scalingContext,
@@ -361,7 +361,28 @@ define(['jquery', 'underscore', 'Backbone', 'd3', '../commons/CommonWidgetView',
 
                 }
 
+            },
+
+            resize: function (options) {
+                var self = this;
+
+                var h = options.height || 200;
+                self.height(h).width(options.width || 500);
+
+                self.scalingContext.width(self.width())
+
+                // put the titles to the right
+                Object.values(self.xicPanes).forEach(function(p){
+                  p.elTitle.attr('x', self.width());
+                });
+
+                // adapt the brush areas
+                self.gBrushBackground.attr('width', self.width());
+                self.gxaxisBackground.attr('width', self.width());
+
+                self.render();
             }
+
         });
 
         return XICMultiPaneView;
