@@ -1,6 +1,6 @@
 {
   "name": "sib-fishtones-js",
-  "version": "0.1.27",
+  "version": "0.1.30",
   "description": "LC/MSMS libraries, dry, wet & match",
   "maintainers": [
     "Roman Mylonas <roman.mylonas@sib.swiss>"

@@ -328,6 +328,9 @@ define(['underscore', 'd3', '../commons/CommonWidgetView', 'fishtones/views/util
                 self.p_flying_dont_fly_away()
             }
 
+            // adapt the brush area
+            self.gBrushBackground.attr('width', self.width());
+
             self.render()
         },
         refresh: function () {

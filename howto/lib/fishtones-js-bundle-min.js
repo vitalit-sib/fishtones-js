@@ -18887,6 +18887,9 @@ define('fishtones/views/match/MatchSpectrumView',['underscore', 'd3', '../common
                 self.p_flying_dont_fly_away()
             }
 
+            // adapt the brush area
+            self.gBrushBackground.attr('width', self.width());
+
             self.render()
         },
         refresh: function () {
